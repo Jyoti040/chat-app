@@ -1,20 +1,25 @@
-import React, { lazy } from 'react'
-import { AppBar, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material'
+import React, { lazy, Suspense, useState } from 'react'
+import { AppBar, Backdrop, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material'
 import { orange } from '../../constants/colors'
-import { Add, Group, Logout, Menu, NotificationAdd, Notifications, Search } from '@mui/icons-material'
+import { Add, Group, Logout, Menu, NotificationAdd, Notifications, Search as SearchIcon } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 
-const searchDialog = lazy(()=>import('../Shared/Search'))
-const notificationDialog = lazy(()=>import('../Shared/Notifications'))
-const newGroupDialog = lazy(()=>import('../Shared/NewGroup'))
+const SearchDialog = lazy(()=>import('../Shared/Search'))
+const NotificationsDialog= lazy(()=>import('../Shared/Notifications'))
+const NewGroupDialog = lazy(()=>import('../Shared/NewGroup'))
 
 const Header = () => {
     const navigate = useNavigate()
-    
+    const [isSearch,setIsSearch]=useState(false)
+    const [isNotification,setIsNotification]=useState(false)
+    const [isNewGorup,setIsNewGorup]=useState(false)
+
     const openSearchDiagloue = () => {
+        setIsSearch((prev)=>!prev)
         console.log('in search box')
     }
     const openNewGroup = () => {
+        setIsNewGorup((prev)=>!prev)
         console.log('in new grp')
     }
     const navigateToGroups = () => {
@@ -22,6 +27,7 @@ const Header = () => {
         navigate('/groups')
     }
     const openNotifications = () => {
+        setIsNotification((prev)=>!prev)
         console.log('in notifications')
         
     }
@@ -31,7 +37,8 @@ const Header = () => {
     }
 
     return (
-        <Box sx={{ flexGrow: 1, height: "4rem" }}>
+       <>
+           <Box sx={{ flexGrow: 1, height: "4rem" }}>
             <AppBar
                 position='static' sx={{ bgcolor: orange }}
             >
@@ -47,7 +54,7 @@ const Header = () => {
                     <Box sx={{ flexGrow: "1" }}
                     />
                     <Box>
-                        <IconBtn  title={'Search a user'} Icon={<Search />} func={openSearchDiagloue}/>
+                        <IconBtn  title={'Search a user'} Icon={<SearchIcon />} func={openSearchDiagloue}/>
                         <IconBtn  title={'New Group'} Icon={<Add />} func={openNewGroup}/>
                         <IconBtn  title={'Manage Groups'} Icon={<Group />} func={navigateToGroups}/>
                         <IconBtn  title={'Notifications'} Icon={<Notifications />} func={openNotifications}/>
@@ -71,6 +78,23 @@ const Header = () => {
                 </Toolbar>
             </AppBar>
         </Box>
+
+        {
+            isSearch &&<Suspense fallback={<Backdrop open/>}>
+                <SearchDialog/>
+            </Suspense>
+        }
+        {
+            isNotification &&<Suspense fallback={<Backdrop open/>}>
+                <NotificationsDialog/>
+            </Suspense>
+        }
+        {
+            isNewGorup &&<Suspense fallback={<Backdrop open/>}>
+                <NewGroupDialog/>
+            </Suspense>
+        }
+       </>
     )
 }
 
