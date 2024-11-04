@@ -1,8 +1,13 @@
+import { Dialog, Stack } from '@mui/material'
 import React from 'react'
 
 const Search = () => {
   return (
-    <div>Search</div>
+    <Dialog open >
+        <Stack width={"25rem"}>
+
+        </Stack>
+    </Dialog>
   )
 }
 

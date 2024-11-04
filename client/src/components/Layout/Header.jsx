@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useState } from 'react'
 import { AppBar, Backdrop, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material'
 import { orange } from '../../constants/colors'
-import { Add, Group, Logout, Menu, NotificationAdd, Notifications, Search as SearchIcon } from '@mui/icons-material'
+import { Add, Group, Logout, Menu, NotificationAdd, Notifications, Person, Search as SearchIcon } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 
 const SearchDialog = lazy(()=>import('../Shared/Search'))
@@ -36,6 +36,10 @@ const Header = () => {
         
     }
 
+    const handleGoToProfile=()=>{
+        console.log('in profile section')
+        navigate('/profile/1')
+    }
     return (
        <>
            <Box sx={{ flexGrow: 1, height: "4rem" }}>
@@ -58,6 +62,7 @@ const Header = () => {
                         <IconBtn  title={'New Group'} Icon={<Add />} func={openNewGroup}/>
                         <IconBtn  title={'Manage Groups'} Icon={<Group />} func={navigateToGroups}/>
                         <IconBtn  title={'Notifications'} Icon={<Notifications />} func={openNotifications}/>
+                        <IconBtn  title={'My Profile'} Icon={<Person />} func={handleGoToProfile}/>
                         <IconBtn  title={'Logout'} Icon={<Logout />} func={handleLogout}/>
                         {/* <Tooltip title='Search a user'>
                             <IconButton color='inherit' size='large' onClick={openSearchDiagloue}>

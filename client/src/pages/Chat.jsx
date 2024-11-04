@@ -7,4 +7,4 @@ const Chat = () => {
   )
 }
 
-export default AppLayout()(Home);
+export default AppLayout()(Chat);
