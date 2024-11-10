@@ -2,7 +2,7 @@ import React from 'react'
 import Header from './Header'
 import Title from '../Shared/Title'
 import { Grid } from '@mui/material'
-import ChatLists from '../Shared/ChatLists'
+import ChatLists from '../specific/ChatLists'
 import { useParams } from 'react-router-dom'
 
 const sampleChats=[

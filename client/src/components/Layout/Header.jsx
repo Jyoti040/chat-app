@@ -4,9 +4,9 @@ import { orange } from '../../constants/colors'
 import { Add, Group, Logout, Menu, NotificationAdd, Notifications, Person, Search as SearchIcon } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 
-const SearchDialog = lazy(()=>import('../Shared/Search'))
-const NotificationsDialog= lazy(()=>import('../Shared/Notifications'))
-const NewGroupDialog = lazy(()=>import('../Shared/NewGroup'))
+const SearchDialog = lazy(()=>import('../specific/Search'))
+const NotificationsDialog= lazy(()=>import('../specific/Notifications'))
+const NewGroupDialog = lazy(()=>import('../specific/NewGroup'))
 
 const Header = () => {
     const navigate = useNavigate()
