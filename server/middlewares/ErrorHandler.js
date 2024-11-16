@@ -6,7 +6,7 @@ const ErrorHandler = (err,req,res,next)=>{
         err.message = "duplicate email"
     }
 
-    const statusCode = err.statusCode || 500 // internal server error
+    const statusCode = err.statusCode || 500 
     const message = err.message || 'Something went wrong , please try again later'
 
     
