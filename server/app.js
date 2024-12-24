@@ -9,7 +9,7 @@ const ErrorHandlerMiddleware = require('./middleware/ErrorHandler')
 
 const userRoutes = require('./routes/user')
 
-app.use(express.json())
+app.use(express.json()) // access json data sent in req.body
 
 app.use('api/v1/user',userRoutes)
 
