@@ -3,15 +3,21 @@ const express = require('express')
 const app=express()
 
 const connectDB = require('./db/connect')
+const cookieParser = require('cookie-parser')
+
 const CustomError = require('./errors/CustomError')
 const NotFoundMiddleware = require('./middleware/NotFound')
 const ErrorHandlerMiddleware = require('./middleware/ErrorHandler')
 
+
 const userRoutes = require('./routes/user')
+const chatRoutes = require('./routes/chat')
 
 app.use(express.json()) // access json data sent in req.body
+app.use(cookieParser())
 
 app.use('api/v1/user',userRoutes)
+app.use('api/v1/chat',chatRoutes)
 
 app.get('/',(req,res)=>{
       res.send('Welcome to chat app')

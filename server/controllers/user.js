@@ -1,6 +1,6 @@
 const CustomAPIError = require('../errors/CustomError')
 const User = require('../models/user')
-
+const cookieOptions = require("../constants/constants")
 const createUserToken = async(ID , next) =>{
         try {
             const user = await User.findById(ID)
@@ -52,15 +52,15 @@ const registerUser = async(req,res,next)=>{
 
    const token = await createUserToken(createdUser._id) 
 
-   const options = {
-    maxAge:15*24*60*60*1000, // 15 days
-    sameSite:"none",
-    httpOnly : true ,
-    secure : true ,
-  }
+//    const options = {
+//     maxAge:15*24*60*60*1000, // 15 days
+//     sameSite:"none",
+//     httpOnly : true ,
+//     secure : true ,
+//   }
 
    return res.status(201)
-   .cookie("authToken",token,options)
+   .cookie("authToken",token,cookieOptions)
      .json({
         success:true,
          message : 'User registerd successfully' ,
@@ -116,5 +116,49 @@ const loginUser = async(req,res,next)=>{
      }
 }
 
+const getUserProfile = async(req,res,next)=>{
+    try {
+        return res.status(200).json({
+            success:true,
+            user:req.user
+        })
+    } catch (error) {
+        next(error)
+    }
+}
 
-module.exports = {registerUser , loginUser}
+const logout = async(req,res,next)=>{
+    try {
+        await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                $unset : {
+                    token : ""
+                }
+            },{
+                new : true
+            }
+        )
+
+        return res.status(200)
+      .clearCookie("authToken",{
+        ...cookieOptions , maxAge:0
+      })
+      .json({
+        success:true,
+        message : 'logged out successfully'
+      })   
+    } catch (error) {
+        next(error)
+    }
+}
+
+const searchUser = async(req,res,next)=>{
+    try {
+      
+    } catch (error) {
+        next(error)
+    }
+}
+
+module.exports = {registerUser , loginUser , getUserProfile , logout , searchUser}

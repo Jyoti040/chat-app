@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const upload = require('../utils/multer')
-const {registerUser , loginUser} = require('../controllers/user')
+const {registerUser , loginUser , getUserProfile , logout , searchUser} = require('../controllers/user')
+const {verifyUser} = require('../middlewares/Auth')
 
 router.post('/register',upload.single('avatar'),async (req,res,next)=>{
     try {
@@ -16,6 +17,9 @@ router.post('/register',upload.single('avatar'),async (req,res,next)=>{
 } , registerUser)
 router.post('/login',loginUser)
 
-
+router.use(verifyUser) // all the furrther routes must be authenticated
+router.get('/my-profile',getUserProfile)
+router.get('/logout',logout)
+router.get('/search-user',searchUser)
 
 module.exports = router
