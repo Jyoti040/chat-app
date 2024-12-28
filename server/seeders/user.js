@@ -1,6 +1,8 @@
-// fake data - ttesting purpose4
+// fake data - testing purpose , not for production
+const Chat = require("../models/chat")
+const Message = require("../models/message")
 const User = require("../models/user")
-const {faker} = require("@faker-js/faker")
+const {faker, simpleFaker} = require("@faker-js/faker")
 
 const createUser = async(numUsers)=>{
     try {
@@ -30,4 +32,4 @@ const createUser = async(numUsers)=>{
     }
 }
 
-module.exports = {createUser} // call in app.js only once 
+module.exports = {createUser } // call in app.js only once 

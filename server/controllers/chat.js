@@ -1,6 +1,6 @@
 const CustomAPIError = require("../errors/CustomError")
 const Chat = require("../models/chat")
-const {emitEvent} = require("../utils/features")
+const {emitEvent, deleteFilesFromCloudinary} = require("../utils/features")
 const getOtherMember = require("../lib/helper")
 const User = require("../models/user")
 const Message = require("../models/message")
@@ -334,7 +334,90 @@ const renameGroup = async(req,res,next)=>{
         next(error)
     }
 }
+
+const deleteChat = async(req,res,next)=>{
+    try {
+        const chatId = req.params.id
+        const chat = await Chat.findById(chatId)
+
+        if(!chat){
+            throw new CustomAPIError("No chat found",404)
+        }
+
+        if(chat.groupChat && chat.creator.toString() !== req.user.toString()){
+            throw new CustomAPIError("You are not allowed to delete the group",403)
+        }
+
+        if(!chat.groupChat && !chat.members.includes(req.user.toString())){
+            throw new CustomAPIError("You are not allowed to delete the group",403)
+        }
+
+        const members = chat.members
+
+        const messageWithAttachments = await Message.find({
+            chat : chatId,
+            attachments : {
+                $exists : true ,
+                $ne : [],
+            }
+        })
+
+        const public_ids = []
+
+        messageWithAttachments.forEach(({attachments})=>{
+            attachments.forEach(({public_id})=>public_ids.push(public_id))
+        })
+
+        await Promise.all([
+            deleteFilesFromCloudinary(public_ids),
+            chat.deleteOne(),
+            Message.deleteMany({chat:chatId})
+        ])
+
+        emitEvent(req,"refetch_chats",members)
+
+        return res.status(200).json({
+            success:true,
+            message:"Chat deleted successfully"
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+const getMessages = async(req,res,next)=>{
+    try {
+        const chatId = req.params.id
+        const {page = 1} = req.query
+        const limit = 20 // per page limit 
+
+        const skip = (page-1) * limit
+
+        const [messages,totalMessageCount] = await Promise.all([
+        Message.find({chat:chatId})
+        .sort({creatadAt : -1}) // descending order of message created 
+        .skip(skip)
+        .limit(limit)
+        .populate("sender","name")
+        .lean(),
+
+        Message.countDocuments({chat:chatId})
+        ])
+
+        const totalPages = Math.ceil(totalMessageCount/limit) || 0
+
+        return res.status(200).json({
+            success:true , 
+            messages:messages.reverse(),
+            totalPages
+        })
+    } catch (error) {
+        next(error)
+    }
+}
 module.exports = {
-    newGroupChat , getMyChats , getMyGroups , addMembers,removeMember , leaveGroup , sendAttachments , getChatDetails,
-    renameGroup
+    newGroupChat , getMyChats , getMyGroups ,
+     addMembers,removeMember , leaveGroup ,
+      sendAttachments , getChatDetails,
+    renameGroup,deleteChat,getMessages
 }

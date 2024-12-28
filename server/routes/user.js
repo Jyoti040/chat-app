@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router();
 const upload = require('../utils/multer')
 const {registerUser , loginUser , getUserProfile , logout , searchUser} = require('../controllers/user')
-const {verifyUser} = require('../middlewares/Auth')
+const {verifyUser} = require('../middlewares/Auth');
+const { registerValidator, validateHandler, loginValidator } = require('../lib/validators');
 
 router.post('/register',upload.single('avatar'),async (req,res,next)=>{
     try {
@@ -14,8 +15,9 @@ router.post('/register',upload.single('avatar'),async (req,res,next)=>{
     } catch (error) {
         next(error)
     }
-} , registerUser)
-router.post('/login',loginUser)
+} , registerValidator() ,validateHandler,registerUser)
+
+router.post('/login',loginValidator(),validateHandler,loginUser)
 
 router.use(verifyUser) // all the furrther routes must be authenticated
 router.get('/my-profile',getUserProfile)

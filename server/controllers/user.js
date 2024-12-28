@@ -1,6 +1,7 @@
 const CustomAPIError = require('../errors/CustomError')
 const User = require('../models/user')
 const cookieOptions = require("../constants/constants")
+
 const createUserToken = async(ID , next) =>{
         try {
             const user = await User.findById(ID)
@@ -24,11 +25,11 @@ const createUserToken = async(ID , next) =>{
 
 const registerUser = async(req,res,next)=>{   
   try {
-     const {name , userName , userEmail, password , bio , avatar } = req.body
+     const {name , userName , userEmail, password , bio  } = req.body
 
-     if([name, userName , userEmail , password , bio ].some((field)=>field?.trim()==="")){
-        throw new CustomAPIError('Please provide all the details',400)
-    }
+    //  if([name, userName , userEmail , password , bio ].some((field)=>field?.trim()==="")){
+    //     throw new CustomAPIError('Please provide all the details',400)
+    // }
 
     const user = await User.findOne({
         $or :[ {userName , userEmail} ]
