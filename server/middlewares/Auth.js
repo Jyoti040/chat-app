@@ -1,5 +1,5 @@
 const CustomAPIError = require('../errors/CustomError')
-const User = require('../models/UserSchema')
+const User = require('../models/user')
 const jwt =require("jsonwebtoken")
 
 const verifyUser = async(req,res,next)=>{

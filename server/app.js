@@ -6,8 +6,8 @@ const connectDB = require('./db/connect')
 const cookieParser = require('cookie-parser')
 
 const CustomError = require('./errors/CustomError')
-const NotFoundMiddleware = require('./middleware/NotFound')
-const ErrorHandlerMiddleware = require('./middleware/ErrorHandler')
+const NotFoundMiddleware = require('./middlewares/NotFound.js')
+const ErrorHandlerMiddleware = require('./middlewares/ErrorHandler.js')
 
 
 const userRoutes = require('./routes/user')

@@ -63,13 +63,24 @@ const sendAttachmentsValidator = () => [
 ]  
 
 const renameGroupValidator = () => [
-    body("chatId", "Please provide a chat ID").notEmpty(),
+    param("id", "Please provide a chat ID").notEmpty(),
+    body("name", "Please enter a group name").notEmpty(),
+] 
+
+const sendFriendRequestValidator = () => [
+    body("userId", "Please enter a user ID").notEmpty(),
 ]  
 
-
+const acceptFriendRequestValidator = () => [
+    body("requestId", "Please enter a request ID").notEmpty(),
+    body("accept")
+    .notEmpty().withMessage("Please add accept")
+    .isBoolean().withMessage("Accept must be boolean")
+]  
 
 module.exports = { 
     registerValidator, loginValidator, validateHandler ,
      newGroupChatValidator  , addMembersValidator , removeMembersValidator,
-     chatIdValidator , sendAttachmentsValidator
+     chatIdValidator , sendAttachmentsValidator , renameGroupValidator,
+     sendFriendRequestValidator , acceptFriendRequestValidator
     }

@@ -1,6 +1,9 @@
 const CustomAPIError = require('../errors/CustomError')
 const User = require('../models/user')
+const Request = require('../models/request')
 const cookieOptions = require("../constants/constants")
+const { emitEvent } = require('../utils/features')
+const Chat = require('../models/chat')
 
 const createUserToken = async(ID , next) =>{
         try {
@@ -156,10 +159,103 @@ const logout = async(req,res,next)=>{
 
 const searchUser = async(req,res,next)=>{
     try {
-      
+     // all my chats -> all my friends ids -> remaining user ids 
+      const {name=""} = req.query
+
+      const myChats=await Chat.find({groupChat : false , members : req.user})
+      // me and my chats - friends included
+      const allUsersFromMyChats= myChats.map((chat)=>chat.members).flat();  // returns only a single array , combines array within an array in to single array
+      const allRemainingUsers = await User.find({
+        _id:{$nin : allUsersFromMyChats} , //  not in operator 
+        name:{$regex : name , $options :"i"} //pattern matching while searching user , i - case in sensitive
+      })
+
+      const users = allRemainingUsers.map(({_id,name,avatar})=>({
+        _id,name,
+        avatar:avatar.url 
+      }))
+
+      return res.status(200).json({
+        success:true,
+        users
+      })
     } catch (error) {
         next(error)
     }
 }
 
-module.exports = {registerUser , loginUser , getUserProfile , logout , searchUser}
+const sendFriendRequest = async(req,res,next)=>{
+    try {
+        const {userId} = req.body
+
+        const request = await Request.findOne({   // requests already exists 
+              $or:[
+                {sender : req.user , receiver : userId},
+                {sender : userId , receiver : req.user},
+              ]
+        })
+
+        if(request){
+            throw new CustomAPIError('Request already exists',400)   
+        }
+
+        await Request.create({
+            sender:req.user , 
+            receiver:userId
+        })
+
+        emitEvent(req,"new_request",[userId])
+
+        return res.status(200).json({
+            success:true ,
+            message:"Friend request sent"
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+const acceptFriendRequest = async(req,res,next)=>{
+    try {
+        const { requestId , accept} = req.body
+
+        const request = await Request.findById(requestId)
+                       .populate("sender","name")
+                       .populate("receiver","name")
+
+        if(!request){
+            throw new CustomAPIError('Request doesnot exists',404)   
+        }  
+        
+        if(request.receiver.toString() !== req.user.toString()){
+            throw new CustomAPIError('Unauthorised to accept the friend request',401)   
+        }
+
+        if(!accept){
+            await  request.deleteOne()
+
+            return res.status(200).json({
+                success:true ,
+                message:"Friend request rejected"
+            })
+        }
+            const members = [request.sender._id , request.receiver._id]
+            await Promise.all([
+                Chat.create({
+                    members, name : `${request.sender.name} - ${request.receiver.name}`
+                }),
+                request.deleteOne()
+            ])
+        
+
+        emitEvent(req,"refetech_chats",members)
+        return res.status(200).json({
+            success:true ,
+            message:"Friend request accepted",
+            senderId:request.sender._id
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+module.exports = {registerUser , loginUser , getUserProfile , logout , searchUser , sendFriendRequest , acceptFriendRequest}

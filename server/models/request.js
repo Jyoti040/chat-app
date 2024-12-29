@@ -20,5 +20,5 @@ const requestSchema = new mongoose.Schema({
     timestamps:true
 })
 
-const Request = mongoose.models.Request ||  mongoose.model('Request',RequestSchema)
+const Request = mongoose.models.Request ||  mongoose.model('Request',requestSchema)
 module.exports = Request
