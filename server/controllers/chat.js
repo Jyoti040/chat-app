@@ -223,6 +223,16 @@ const sendAttachments = async(req,res,next)=>{
     try {
         const {chatId }= req.body
 
+        const files = req.files || []
+
+        if(files.length<1){
+            throw new CustomAPIError("Please provide atachments",400)
+        }
+
+        if(files.length>5){
+            throw new CustomAPIError("Attachments should not be more than 5",400)
+        }
+
         const [chat , user] = await Promise.all([
             Chat.findById(chatId),
             User.findById(req.user,"name"),
@@ -232,12 +242,7 @@ const sendAttachments = async(req,res,next)=>{
             throw new CustomAPIError("No chat found",404)
         }
         
-        const files = req.files || []
-
-        if(files.length<1){
-            throw new CustomAPIError("Please provide atachments",400)
-        }
-
+        
         const attachments = []
         const messageForRealTime ={
             content : "" , attachments ,

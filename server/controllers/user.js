@@ -4,6 +4,7 @@ const Request = require('../models/request')
 const cookieOptions = require("../constants/constants")
 const { emitEvent } = require('../utils/features')
 const Chat = require('../models/chat')
+const { getOtherMember } = require('../lib/helper')
 
 const createUserToken = async(ID , next) =>{
         try {
@@ -124,9 +125,13 @@ const loginUser = async(req,res,next)=>{
 
 const getUserProfile = async(req,res,next)=>{
     try {
+        const user = await User.findById(req.user)
+        if(!user){
+            throw new CustomAPIError("User not found ",404)
+        }
         return res.status(200).json({
             success:true,
-            user:req.user
+            user
         })
     } catch (error) {
         next(error)
@@ -229,7 +234,7 @@ const acceptFriendRequest = async(req,res,next)=>{
             throw new CustomAPIError('Request doesnot exists',404)   
         }  
         
-        if(request.receiver.toString() !== req.user.toString()){
+        if(request.receiver._id.toString() !== req.user.toString()){
             throw new CustomAPIError('Unauthorised to accept the friend request',401)   
         }
 
@@ -260,4 +265,64 @@ const acceptFriendRequest = async(req,res,next)=>{
         next(error)
     }
 }
-module.exports = {registerUser , loginUser , getUserProfile , logout , searchUser , sendFriendRequest , acceptFriendRequest}
+
+const getAllNotifications=async(req,res,next)=>{
+    try {
+        const requests = await Request.find({receiver:req.user}).populate("sender","name avatar")
+        const allRequests = requests.map(({_id,sender})=>({
+            _id, sender:{
+                _id:sender._id,
+                name:sender.name,
+                avatar:sender.avatar.url
+            }
+        }))
+
+        return res.status(200).json({
+            success:true,
+            allRequests
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+const getAllFriends=async(req,res,next)=>{
+     try {
+        const chatId = req.query?.chatId
+
+        const chats = await Chat.find({
+            members:req.user , groupChat:false
+        }).populate("members","name avatar")
+
+        const friends=chats.map(({members})=>{
+             const otherUser = getOtherMember(members,req.user)
+
+             return {
+                _id:otherUser._id,
+                name:otherUser.name,
+                avatar:otherUser.avatar.url
+             }
+        })
+
+        if(chatId){
+            const chat = await Chat.findById(chatId)
+
+            const availableFriends = friends.filter(   // excludes already included friends
+                (friend)=> !chat.members.includes(friend._id)
+            )
+            return res.status(200).json({
+                success:true,
+                friends : availableFriends
+             })
+        }else{            
+            return res.status(200).json({
+               success:true,
+               friends
+            })
+        }
+     } catch (error) {
+        next(error)
+     }
+}
+
+module.exports = {registerUser , loginUser , getUserProfile , logout , searchUser , sendFriendRequest , acceptFriendRequest,getAllNotifications , getAllFriends}

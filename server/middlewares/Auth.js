@@ -17,7 +17,7 @@ const verifyUser = async(req,res,next)=>{
         if(!user){
             throw new CustomAPIError("Invalid token" , 401);
         }
-        req.user = user
+        req.user = user._id
         next()
         
     } catch (error) {

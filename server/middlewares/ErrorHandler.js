@@ -1,15 +1,26 @@
+const { envMode } = require('../app')
 const CustomAPIError = require('../errors/CustomError')
 
 const ErrorHandler = (err,req,res,next)=>{
 
     if(err.code===11000){
-        err.message = "Duplicate email"
+        const error = Object.keys(err.keyPattern).join(" , ")
+        err.message = `Duplicate fields - ${error}`,
+        err.statusCode = 400
+    }
+
+    if(err.name == "CastError"){
+        err.message = `Invalid format of - ${err.path}`,
+        err.statusCode = 400
     }
 
     const statusCode = err.statusCode || 500 
     const message = err.message || 'Something went wrong , please try again later'
 
-    return res.status(statusCode).json({message})
+    return res.status(statusCode).json({
+        success:false,
+        message: envMode === "DEVELOPMENT"?err:message
+    })
     
 }
 

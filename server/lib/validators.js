@@ -15,7 +15,6 @@ const validateHandler = (req, res, next) => {  // this func will be called if ab
     }
 }
 
-
 const registerValidator = () => [
     // userName , userEmail, password , bio
     // body(["name","userName","password","bio"]).notEmpty(),
@@ -24,7 +23,6 @@ const registerValidator = () => [
     body("password", "Please provide a password").notEmpty(),
     body("bio", "Please provide a bio").notEmpty(),
     body("userEmail").notEmpty().isEmail(),
-    check("avatar","Please upload an avatar ").notEmpty()
 ]  // returns array on calling
 
 const loginValidator = () => [
@@ -57,9 +55,6 @@ const chatIdValidator = () => [
 
 const sendAttachmentsValidator = () => [
     body("chatId", "Please provide a chat ID").notEmpty(),
-    check("files")
-    .notEmpty().withMessage("Please upload attachments ")
-    .isArray({min:1 , max:5}).withMessage("Attachments must be with range of 1-5")
 ]  
 
 const renameGroupValidator = () => [

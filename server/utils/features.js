@@ -1,10 +1,14 @@
- const {cloudinary} = require('./cloudinary')
+ const CustomAPIError = require('../errors/CustomError')
+const {cloudinary} = require('./cloudinary')
 const emitEvent = (req,event,users,data)=>{
         console.log("emitting event " , event)
 }
 
 const uploadToCloudinary = async(req,res,next)=>{
        try {
+        if(!req.file){
+                throw new CustomAPIError("Please upload an avatar",400)
+        }
         const result = await cloudinary.uploader.upload(req.file.path)
         req.avatar={
          public_id : result.public_id,

@@ -7,7 +7,7 @@ const {
     getMessages} = require('../controllers/chat')
 const {verifyUser} = require('../middlewares/Auth');
 const { attachmentsMulter } = require('../utils/multer');
-const { newGroupChatValidator, validateHandler, addMembersValidator, removeMembersValidator, chatIdValidator, sendAttachme, chatIdValidatorntsValidator, renameGroupValidator } = require('../lib/validators');
+const { newGroupChatValidator, validateHandler, addMembersValidator, removeMembersValidator, chatIdValidator, sendAttachmentsValidator, chatIdValidatorntsValidator, renameGroupValidator } = require('../lib/validators');
 
 router.use(verifyUser) // all the furrther routes must be authenticated
 
