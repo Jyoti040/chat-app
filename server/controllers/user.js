@@ -34,6 +34,8 @@ const registerUser = async(req,res,next)=>{
     //     throw new CustomAPIError('Please provide all the details',400)
     // }
 
+    const avatar = req.avatar
+
     const user = await User.findOne({
         $or :[ {userName , userEmail} ]
     })

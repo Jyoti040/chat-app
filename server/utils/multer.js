@@ -9,17 +9,15 @@ const cloudinary = require('./cloudinary')
         
 //     }
 // })
-const storage = multer.diskStorage({
-    destination : function(req,file,cb){
-        cb(null,'./public/temp')
+const storage = multer.diskStorage({}) //directlyy using cloudinary 
+
+const upload = multer({
+    storage:storage,
+    limits:{
+        fileSize:1024*1024* 5 // 5mb
     },
-    filename : function(req,file,cb){
-        cb(null,file.originalname)
-    }
 })
-const upload = multer({storage : storage})
 
 const attachmentsMulter = upload.array("files",5) // max 5 files 
 
-module.exports = upload
-module.exports =  {attachmentsMulter}
+module.exports =  {upload , attachmentsMulter}
