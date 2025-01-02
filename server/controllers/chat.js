@@ -421,8 +421,15 @@ const getMessages = async(req,res,next)=>{
     }
 }
 module.exports = {
-    newGroupChat , getMyChats , getMyGroups ,
-     addMembers,removeMember , leaveGroup ,
-      sendAttachments , getChatDetails,
-    renameGroup,deleteChat,getMessages
+    newGroupChat , 
+    getMyChats ,
+    getMyGroups ,
+    addMembers,
+    removeMember ,
+    leaveGroup ,
+    sendAttachments ,
+    getChatDetails,
+    renameGroup,
+    deleteChat,
+    getMessages
 }
