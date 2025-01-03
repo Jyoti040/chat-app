@@ -2,7 +2,7 @@ const CustomAPIError = require('../errors/CustomError')
 const User = require('../models/user')
 const Request = require('../models/request')
 const cookieOptions = require("../constants/constants")
-const { emitEvent } = require('../utils/features')
+const { emitEvent, uploadToCloudinary } = require('../utils/features')
 const Chat = require('../models/chat')
 const { getOtherMember } = require('../lib/helper')
 
@@ -31,11 +31,20 @@ const registerUser = async(req,res,next)=>{
   try {
      const {name , userName , userEmail, password , bio  } = req.body
 
+     uploadToCloudinary(req,res,next)
     //  if([name, userName , userEmail , password , bio ].some((field)=>field?.trim()==="")){
     //     throw new CustomAPIError('Please provide all the details',400)
     // }
 
+    // const file = req.file
+
+    // const result = await uploadToCloudinary(file)
+
     const avatar = req.avatar
+    //  {
+    //     public_id:result.public_id,
+    //     url:result.url
+    // }
 
     const user = await User.findOne({
         $or :[ {userName , userEmail} ]

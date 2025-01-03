@@ -12,6 +12,7 @@ const io = new Server(server,{})
 const connectDB = require('./db/connect')
 const cookieParser = require('cookie-parser')
 const {v4} = require("uuid")
+const cors = require('cors')
 
 const CustomError = require('./errors/CustomError')
 const NotFoundMiddleware = require('./middlewares/NotFound.js')
@@ -22,6 +23,10 @@ const chatRoutes = require('./routes/chat')
 const { getSockets } = require('./lib/helper.js')
 const Message = require('./models/message.js')
 
+app.use(cors({
+    origin : process.env.CORS_ORIGIN,  // can pass array -[]
+    credentials : true 
+}))
 app.use(express.json()) // access json data sent in req.body
 app.use(cookieParser())
 
