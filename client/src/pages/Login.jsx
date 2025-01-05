@@ -3,12 +3,18 @@ import React ,{ useState} from 'react'
 import {Link} from 'react-router-dom'
 import { CameraAlt  } from '@mui/icons-material'
 import { VisuallyHiddenInput } from '../components/styles/StyledComponents'
+import axios from 'axios'
+import { server } from '../constants/config'
+import { useDispatch } from 'react-redux'
+import { userExists } from '../redux/reducers/auth'
+import toast from 'react-hot-toast'
 // import { useInputValidation } from '6pp'
 // import { usernameValidator } from '../utils/validators'
 
 const Login = () => {
  const [isLogin , setIsLogin] = useState(true)
  const [error , setError]= useState(false)
+ const dispatch = useDispatch()
 //  const name=useInputValidation("");
 //  const username=useInputValidation("",usernameValidator);
 //  const bio=useInputValidation("");
@@ -18,8 +24,27 @@ const Login = () => {
 const [email , setEmail] = useState("")
 const [password , setPassword] = useState("")
 
-const handleLogin = (e)=>{
+const handleLogin = async(e)=>{
     e.preventDefault()
+
+    const config ={
+        withCredentials:true , 
+        headers:{
+            "Content-Type":"application/json"
+        }
+    }
+
+  try {
+    const {data}=axios.post(`${server}/api/v1/user/login`,{
+        userEmail:email,
+        password
+    },config)
+
+    dispatch(userExists(true))
+    toast.success(data.message)
+  } catch (error) {toast.error(error?.response?.data?.message || "Something went wrong")
+    
+  }
 }
   return (
  <div style={{

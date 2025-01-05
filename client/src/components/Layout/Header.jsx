@@ -3,6 +3,11 @@ import { AppBar, Backdrop, Box, IconButton, Toolbar, Tooltip, Typography } from 
 import { orange } from '../../constants/colors'
 import { Add, Group, Logout, Menu, NotificationAdd, Notifications, Person, Search as SearchIcon } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { server } from '../../constants/config'
+import toast from 'react-hot-toast'
+import { useDispatch } from 'react-redux'
+import { userNotExists } from '../../redux/reducers/auth'
 
 const SearchDialog = lazy(()=>import('../specific/Search'))
 const NotificationsDialog= lazy(()=>import('../specific/Notifications'))
@@ -13,6 +18,7 @@ const Header = () => {
     const [isSearch,setIsSearch]=useState(false)
     const [isNotification,setIsNotification]=useState(false)
     const [isNewGorup,setIsNewGorup]=useState(false)
+    const dispatch = useDispatch()
 
     const openSearchDiagloue = () => {
         setIsSearch((prev)=>!prev)
@@ -31,9 +37,15 @@ const Header = () => {
         console.log('in notifications')
         
     }
-    const handleLogout = () => {
+    const handleLogout = async() => {
         console.log('in logout ')
-        
+        try {
+            const {data} = axios.get(`${server}/api/v1/user/logout`,{withCredentials:true})
+            toast.success(data.message)
+            dispatch(userNotExists())
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Something went wrong ")
+        }
     }
 
     const handleGoToProfile=()=>{

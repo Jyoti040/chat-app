@@ -4,10 +4,9 @@ const {upload} = require('../utils/multer')
 const {registerUser , loginUser , getUserProfile , logout , searchUser, sendFriendRequest, acceptFriendRequest, getAllNotifications, getAllFriends} = require('../controllers/user')
 const {verifyUser} = require('../middlewares/Auth');
 const { registerValidator, validateHandler, loginValidator, sendFriendRequestValidator, acceptFriendRequestValidator } = require('../lib/validators');
-const { uploadToCloudinary } = require('../utils/features');
 
 // upload.single('avatar')
-router.post('/register',upload.single("avatar"),uploadToCloudinary , registerValidator() ,validateHandler,registerUser)
+router.post('/register',upload.single("avatar"), registerValidator() ,validateHandler,registerUser)
 
 router.post('/login',loginValidator(),validateHandler,loginUser)
 

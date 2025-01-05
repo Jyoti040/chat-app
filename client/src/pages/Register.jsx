@@ -3,6 +3,12 @@ import React ,{ useState} from 'react'
 import { CameraAlt , VisibilityOff , Visibility  } from '@mui/icons-material'
 import { VisuallyHiddenInput } from '../components/styles/StyledComponents'
 import { Link } from 'react-router-dom'
+import { handlePassword } from '../utils/validators'
+import axios from 'axios'
+import { server } from '../constants/config'
+import { useDispatch } from 'react-redux'
+import { userExists } from '../redux/reducers/auth'
+import toast from 'react-hot-toast'
 // import { useInputValidation } from '6pp'
 // import { usernameValidator } from '../utils/validators'
 
@@ -24,33 +30,7 @@ const [password , setPassword] = useState("")
 const [passwordValidateMessage,setPasswordValidateMessage] = useState('')
 const [bio , setBio] = useState("")
 const [image , setImage] = useState(null)
-
-const handlePassword = (e)=>{
-    let tempPassword=e.target.value;
-    setPassword(tempPassword)
-
-    var lowerCase=/[a-z]/g;
-    var upperCase=/[A-Z]/g;
-    var digit=/\d/;
-    var minLength=/.{8,}/;
-
-    if(!minLength.test(password)) {
-        setPasswordValidateMessage("Password must have atleast 8 characters");
-        return;
-    }else if(!digit.test(password)){
-        setPasswordValidateMessage("Password must have atleast 1 digit");
-        return;
-    }else if(!upperCase.test(password)){
-        setPasswordValidateMessage("Password must have atleast 1 uppercase letter");
-        return;
-    }else if(!lowerCase.test(password)){
-        setPasswordValidateMessage("Password must have atleast 1 lowercase letter ");
-        return;
-    }else{
-        setPasswordValidateMessage("")
-        return;
-    }
-}
+const dispatch = useDispatch()
 
 const togglePasswordVisibility=()=>{
     setShowPassword(!showPassword)
@@ -67,8 +47,31 @@ const handleImage=(e)=>{
    }
 }
 
-const handleRegister = (e)=>{
+const handleRegister = async(e)=>{
     e.preventDefault()
+
+    const config ={
+        withCredentials:true , 
+        headers:{
+            "Content-Type":"multipart/form-data"
+        }
+    }
+
+    const formData = new FormData()
+    formData.append("name",name)
+    formData.append("userName",userName)
+    formData.append("userEmail",email)
+    formData.append("password",password)
+    formData.append("bio",bio)
+    formData.append("avatar",image)
+
+   try {
+    const {data} = await axios.post(`${server}/api/v1/user/register`,formData,config)
+    dispatch(userExists(true))
+    toast.success(data.message)
+   } catch (error) {
+    toast.error(error?.response?.data?.message || "Something went wrong")
+   }
 }
   return (
     <Container component={"main"} maxWidth='sm' sx={{
