@@ -19,4 +19,4 @@ const api=createApi({
 })
 
 export default api
-export const {useMyChatsQuery} = api
+export const { useMyChatsQuery } = api

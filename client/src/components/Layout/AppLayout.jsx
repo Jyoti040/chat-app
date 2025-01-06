@@ -1,9 +1,10 @@
 import React from 'react'
 import Header from './Header'
 import Title from '../Shared/Title'
-import { Grid } from '@mui/material'
+import { Grid, Skeleton } from '@mui/material'
 import ChatLists from '../specific/ChatLists'
 import { useParams } from 'react-router-dom'
+import { useMyChatsQuery } from '../../redux/api/api'
 
 const sampleChats=[
   {
@@ -21,6 +22,8 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
     const params = useParams()
     const chatID= params.chatID;
 
+    const {isLoading , data , isError , error , refetch} = useMyChatsQuery("")
+
     const handleDeleteChat=(e,_id,groupchat)=>{
       e.preventDefault();
       console.log('in delete chat')
@@ -32,13 +35,20 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
 
             <Grid container sx={{ height: 'calc(100vh - 4rem)' }}>
                  <Grid item sm={4} height={"100%"} sx={{display:{xs:'none' , sm:'block'}}}>
-                    <ChatLists chats={sampleChats} chatID={chatID} 
+                    {/* <ChatLists chats={sampleChats} chatID={chatID} 
                     newMessagesAlert={[{
                       chatID:chatID,count:4
                     }]}
                     onlineUsers={["1","2"]}
                     handleDeleteChat={handleDeleteChat}
-                    />
+                    /> */}
+                    {
+                      isLoading ? (<Skeleton/>):(
+                        <ChatLists
+                         chats={data?.chats} chatID={chatID} handleDeleteChat={handleDeleteChat}
+                        />
+                      )
+                    }
                  </Grid>
                  <Grid item xs={12} sm={8} height={"100%"} >
                      <WrappedComponent {...props}/>
