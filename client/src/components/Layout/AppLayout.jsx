@@ -1,10 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Header from './Header'
 import Title from '../Shared/Title'
-import { Grid, Skeleton } from '@mui/material'
+import { Drawer, Grid, Skeleton } from '@mui/material'
 import ChatLists from '../specific/ChatLists'
 import { useParams } from 'react-router-dom'
 import { useMyChatsQuery } from '../../redux/api/api'
+import { useDispatch, useSelector } from 'react-redux'
+import { setIsMobile } from '../../redux/reducers/misc'
+import toast from 'react-hot-toast'
+import { useErrors } from '../../hooks/hooks'
+import Profile from '../specific/Profile'
 
 const sampleChats=[
   {
@@ -20,6 +25,9 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
   return (props)=>{
 
     const params = useParams()
+    const {isMobile} = useSelector((state)=>state.misc)
+    const {user} = useSelector((state)=>state.auth)
+    const dispatch = useDispatch()
     const chatID= params.chatID;
 
     const {isLoading , data , isError , error , refetch} = useMyChatsQuery("")
@@ -28,10 +36,32 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
       e.preventDefault();
       console.log('in delete chat')
     }
+
+    const handleMobileClose=()=>{
+       dispatch(setIsMobile(false))
+    }
+
+    // useEffect(()=>{
+    //    if(isError){
+    //        toast.error(error?.response?.data?.message || "Something went wrong")
+    //    }
+    // },[isError , error ])
+
+    useErrors([{isError,error}])
     return (
         <>
             <Title/>
             <Header/>
+
+            {
+              isLoading ? (<Skeleton/>):(
+                <Drawer open={isMobile} onClose={handleMobileClose}>
+                   <ChatLists
+                         chats={data?.chats} chatID={chatID} handleDeleteChat={handleDeleteChat}
+                    />
+                </Drawer>
+              )
+            }
 
             <Grid container sx={{ height: 'calc(100vh - 4rem)' }}>
                  <Grid item sm={4} height={"100%"} sx={{display:{xs:'none' , sm:'block'}}}>
@@ -53,6 +83,9 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
                  <Grid item xs={12} sm={8} height={"100%"} >
                      <WrappedComponent {...props}/>
                  </Grid>
+
+                 <Profile user={user}/>
+                 {/* user profile */}
             </Grid>
         </>
     )

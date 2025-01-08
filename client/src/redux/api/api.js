@@ -6,7 +6,7 @@ const api=createApi({
     baseQuery:fetchBaseQuery({
         baseUrl:`${server}/api/v1/`
     }),
-    tagTypes:["Chat"],  //cache data that is fetched
+    tagTypes:["Chat","User"],  //cache data that is fetched
     endpoints:(builder)=>({
        myChats : builder.query({ //get req
            query:()=>({
@@ -14,9 +14,45 @@ const api=createApi({
             credentials:"include"
            }),
            providesTags:["Chat"]  // to invalidate data , so data refetched and new cache
-       })
+       }),
+
+       searchUser : builder.query({
+        query:(name)=>({
+            url:`user/search-user?name=${name}`,
+            credentials:"include"
+        }),
+        providesTags:["User"]
+       }),
+
+       getNotifications : builder.query({
+        query:()=>({
+            url:"user/notifications",
+            credentials:"include"
+        }),
+        keepUnusedDataFor:0 //no caching of data
+       }),
+
+       sendFriendRequest : builder.mutation({
+        query:(data)=>({
+          url:"/user/send-friend-request",
+          method:"PUT",
+          credentials:"include",
+          body:data
+        }),
+        invalidatesTags:["User"] // after this api is called , data will be refetched
+       }) ,
+
+       acceptFriendRequest : builder.mutation({
+        query:(data)=>({
+          url:"/user/accept-friend-request",
+          method:"PUT",
+          credentials:"include",
+          body:data
+        }),
+        invalidatesTags:["Chat"]
+       }) ,
     })
 })
 
 export default api
-export const { useMyChatsQuery } = api
+export const { useMyChatsQuery , useLazySearchUserQuery , useSendFriendRequestMutation , useGetNotificationsQuery  , useAcceptFriendRequestMutation} = api

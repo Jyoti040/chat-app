@@ -4,7 +4,7 @@ const initialState = {
    isNewGroup:false,
    isAddMember:false,
    isNotification:false,
-   isMobileMenuFriend:false,
+   isMobile:false,
    isSearch:false,
    isFileMenu:false,
    isDeleteMenu:false,
@@ -15,13 +15,50 @@ const initialState = {
    }
 }
 
+
 const miscSlice = createSlice({
      name:"misc",
      initialState,
      reducers:{
-           
+         setIsNewGroup:(state , action)=>{
+            state.isNewGroup = action.payload
+         } , 
+         setIsAddMember:(state , action)=>{
+            state.isAddMember = action.payload
+         }  ,
+         setIsNotification:(state , action)=>{
+            state.isNotification = action.payload
+         }  ,
+         setIsMobile:(state , action)=>{
+            state.isMobile = action.payload
+         } , 
+         setIsSearch:(state , action)=>{
+            state.isSearch = action.payload
+         }  ,
+         setIsFileMenu:(state , action)=>{
+            state.isFileMenu = action.payload
+         }  ,
+         setIsDeleteMenu:(state , action)=>{
+            state.isDeleteMenu = action.payload
+         }  ,
+         setIsUploadingLoader:(state , action)=>{
+            state.uploadingLoader = action.payload
+         }  ,
+         setIsSelectedDeletedChat:(state , action)=>{
+            state.selectedDeletedChat = action.payload
+         }  ,
      }
 })
 
 export default miscSlice;
-export const {} = miscSlice.actions
+export const {
+    setIsAddMember,
+    setIsDeleteMenu,
+    setIsFileMenu,
+    setIsNewGroup,
+    setIsMobile,
+    setIsNotification,
+    setIsSearch,
+    setIsSelectedDeletedChat,
+    setIsUploadingLoader
+} = miscSlice.actions

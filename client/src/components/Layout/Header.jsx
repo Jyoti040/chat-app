@@ -6,8 +6,9 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { server } from '../../constants/config'
 import toast from 'react-hot-toast'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { userNotExists } from '../../redux/reducers/auth'
+import { setIsMobile, setIsNotification, setIsSearch } from '../../redux/reducers/misc'
 
 const SearchDialog = lazy(()=>import('../specific/Search'))
 const NotificationsDialog= lazy(()=>import('../specific/Notifications'))
@@ -15,28 +16,32 @@ const NewGroupDialog = lazy(()=>import('../specific/NewGroup'))
 
 const Header = () => {
     const navigate = useNavigate()
-    const [isSearch,setIsSearch]=useState(false)
-    const [isNotification,setIsNotification]=useState(false)
+   const {isSearch , isNotification} = useSelector((state)=>state.misc)
     const [isNewGorup,setIsNewGorup]=useState(false)
     const dispatch = useDispatch()
 
     const openSearchDiagloue = () => {
-        setIsSearch((prev)=>!prev)
+        dispatch(setIsSearch(true))
+      //  setIsSearch((prev)=>!prev)
         console.log('in search box')
     }
+
     const openNewGroup = () => {
         setIsNewGorup((prev)=>!prev)
         console.log('in new grp')
     }
+    
     const navigateToGroups = () => {
         console.log('in navigate grp')
         navigate('/groups')
     }
+
     const openNotifications = () => {
-        setIsNotification((prev)=>!prev)
+        dispatch(setIsNotification(true))
         console.log('in notifications')
         
     }
+    
     const handleLogout = async() => {
         console.log('in logout ')
         try {
@@ -51,6 +56,10 @@ const Header = () => {
     const handleGoToProfile=()=>{
         console.log('in profile section')
         navigate('/profile/1')
+    }
+
+    const handleMobile=()=>{
+        dispatch(setIsMobile(true))
     }
     return (
        <>
