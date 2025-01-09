@@ -7,6 +7,7 @@ import { server } from './constants/config'
 import { useDispatch, useSelector } from 'react-redux'
 import { userExists, userNotExists } from './redux/reducers/auth'
 import { Toaster } from "react-hot-toast"
+import { SocketProvider } from './socket'
 
 const Home = lazy(()=>import('./pages/Home'))  
 const Login = lazy(()=>import('./pages/Login'))  
@@ -39,12 +40,16 @@ const App = () => {
         {/* <Route path='/' element={<ProtectedRoute user={user}>
           <Home />
         </ProtectedRoute>}/> */}
-        <Route element={<ProtectedRoute user={user}/>}>
+        <Route element={
+          <SocketProvider>  
+             <ProtectedRoute user={user}/>
+          </SocketProvider>
+        }>
         
            <Route path='/' element={<Home/>}/>
            <Route path='/chat/:chatID' element={<Chat/>}/>
-           <Route path='/profile/:userID' element={<Profile/>}/>
            <Route path='/groups' element={<Group/>}/>
+           <Route path='/profile/:userID' element={<Profile/>}/>
         </Route>
         <Route path='/login' element={<ProtectedRoute user={!user} redirect='/'>
              <Login/>

@@ -38,8 +38,7 @@ const Header = () => {
 
     const openNotifications = () => {
         dispatch(setIsNotification(true))
-        console.log('in notifications')
-        
+        console.log('in notifications')        
     }
     
     const handleLogout = async() => {

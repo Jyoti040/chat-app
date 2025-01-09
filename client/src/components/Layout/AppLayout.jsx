@@ -10,6 +10,7 @@ import { setIsMobile } from '../../redux/reducers/misc'
 import toast from 'react-hot-toast'
 import { useErrors } from '../../hooks/hooks'
 import Profile from '../specific/Profile'
+import { getSocket } from '../../socket'
 
 const sampleChats=[
   {
@@ -29,6 +30,8 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
     const {user} = useSelector((state)=>state.auth)
     const dispatch = useDispatch()
     const chatID= params.chatID;
+
+    const socket = getSocket()
 
     const {isLoading , data , isError , error , refetch} = useMyChatsQuery("")
 
@@ -81,7 +84,7 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
                     }
                  </Grid>
                  <Grid item xs={12} sm={8} height={"100%"} >
-                     <WrappedComponent {...props}/>
+                     <WrappedComponent {...props} chatId={chatID}/>
                  </Grid>
 
                  <Profile user={user}/>
