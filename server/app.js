@@ -4,10 +4,13 @@ require('dotenv').config({
 const express = require('express')
 const { Server } = require("socket.io")
 const { createServer } = require("http")
+const { corsOptions } = require('./constants/constants.js')
 
 const app=express()
 const server = createServer(app)
-const io = new Server(server,{})
+const io = new Server(server,{
+  cors:corsOptions
+})
 
 const connectDB = require('./db/connect')
 const cookieParser = require('cookie-parser')
@@ -22,11 +25,9 @@ const userRoutes = require('./routes/user')
 const chatRoutes = require('./routes/chat')
 const { getSockets } = require('./lib/helper.js')
 const Message = require('./models/message.js')
+const { socketAuthenticator } = require('./middlewares/Auth.js')
 
-app.use(cors({
-    origin : process.env.CORS_ORIGIN,  // can pass array -[]
-    credentials : true 
-}))
+app.use(cors(corsOptions))
 app.use(express.json()) // access json data sent in req.body
 app.use(cookieParser())
 
@@ -40,14 +41,17 @@ app.get('/',(req,res)=>{
 const userSocketIDs = new Map()  // all members currently connected to socket 
 
 io.use((socket , next )=>{
-
+     cookieParser()(socket.request,socket.request.res,
+        async (err)=>{  await socketAuthenticator(err , socket , next)
+     })
 })
 
 io.on("connection",(socket)=>{
-    const user ={  // random for now
-        _id:"123455",
-        name:"test"
-    }
+    // const user ={  // random for now
+    //     _id:"123455",
+    //     name:"test"
+    // }
+    const user = socket.user
     console.log("user connected ",socket.id)
     userSocketIDs.set(user._id.toString() , socket.id)
 

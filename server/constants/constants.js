@@ -5,4 +5,10 @@ const cookieOptions = {
     secure : true ,
   }
 
-  module.exports = {cookieOptions}
+  const corsOptions ={
+    origin : process.env.CORS_ORIGIN,  // can pass array -[]
+    credentials : true ,
+    methods:["GET","PUT","POST","DELETE"]
+}
+
+  module.exports = {cookieOptions , corsOptions}
