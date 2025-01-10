@@ -84,7 +84,7 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
                     }
                  </Grid>
                  <Grid item xs={12} sm={8} height={"100%"} >
-                     <WrappedComponent {...props} chatId={chatID}/>
+                     <WrappedComponent {...props} chatId={chatID} user={user}/>
                  </Grid>
 
                  <Profile user={user}/>

@@ -6,7 +6,7 @@ const api=createApi({
     baseQuery:fetchBaseQuery({
         baseUrl:`${server}/api/v1/`
     }),
-    tagTypes:["Chat","User"],  //cache data that is fetched
+    tagTypes:["Chat","User","Message"],  //cache data that is fetched
     endpoints:(builder)=>({
        myChats : builder.query({ //get req
            query:()=>({
@@ -26,7 +26,7 @@ const api=createApi({
 
        chatDetails : builder.query({
         query:({chatId , populate=false})=>{
-           let url=`/chat/${chatId}`
+           let url=`chat/${chatId}`
            if(populate) url+="?populate=true"
 
            return {
@@ -45,9 +45,17 @@ const api=createApi({
         keepUnusedDataFor:0 //no caching of data
        }),
 
+       getMessages : builder.query({
+        query:({chatId , page })=>({
+            url:`chat/message/${chatId}?page=${page}`,
+            credentials:"include"
+        }),
+       providesTags:["Message"]
+       }),
+
        sendFriendRequest : builder.mutation({
         query:(data)=>({
-          url:"/user/send-friend-request",
+          url:"user/send-friend-request",
           method:"PUT",
           credentials:"include",
           body:data
@@ -57,12 +65,21 @@ const api=createApi({
 
        acceptFriendRequest : builder.mutation({
         query:(data)=>({
-          url:"/user/accept-friend-request",
+          url:"user/accept-friend-request",
           method:"PUT",
           credentials:"include",
           body:data
         }),
         invalidatesTags:["Chat"]
+       }) ,
+
+       sendAttachments : builder.mutation({
+        query:(data)=>({
+          url:"chat/message",
+          method:"POST",
+          credentials:"include",
+          body:data
+        }),
        }) ,
     })
 })
@@ -74,5 +91,7 @@ export const {
     useSendFriendRequestMutation , 
     useGetNotificationsQuery  , 
     useAcceptFriendRequestMutation ,
-    useChatDetailsQuery
+    useChatDetailsQuery,
+    useGetMessagesQuery,
+    useSendAttachmentsMutation
 } = api

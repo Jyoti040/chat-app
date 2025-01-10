@@ -1,6 +1,6 @@
 const CustomAPIError = require("../errors/CustomError")
 const Chat = require("../models/chat")
-const {emitEvent, deleteFilesFromCloudinary} = require("../utils/features")
+const {emitEvent, deleteFilesFromCloudinary, uploadToCloudinary} = require("../utils/features")
 const getOtherMember = require("../lib/helper")
 const User = require("../models/user")
 const Message = require("../models/message")
@@ -241,9 +241,9 @@ const sendAttachments = async(req,res,next)=>{
         if(!chat){
             throw new CustomAPIError("No chat found",404)
         }
-        
-        
-        const attachments = []
+          
+        const attachments = await uploadToCloudinary(files)
+
         const messageForRealTime ={
             content : "" , attachments ,
              sender : {
@@ -420,6 +420,7 @@ const getMessages = async(req,res,next)=>{
         next(error)
     }
 }
+
 module.exports = {
     newGroupChat , 
     getMyChats ,
