@@ -12,15 +12,21 @@ import { useErrors, useSocketEvents } from '../hooks/hooks';
 import {useInfiniteScrollTop} from "6pp"
 import { useDispatch } from 'react-redux';
 import { setIsFileMenu } from '../redux/reducers/misc';
+import { removeMessagesAlert } from '../redux/reducers/chat.js';
 
 const Chat = ({ chatId , user}) => {
 
   const containerRef = useRef(null);
+  const typingTimeout = useRef(null);
+
   const dispatch = useDispatch()
+
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
   const [page, setPage] = useState(1)
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null)
+  const [myselfTyping , setMyselfTyping] =useState(false)
+  const [userTyping , setUserTyping] =useState(false)
 
   const socket = getSocket()
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId }) // if no chatid , then skip this
@@ -38,6 +44,22 @@ const Chat = ({ chatId , user}) => {
 
   const allMessages = [...oldMessages , ...messages]
 
+  const handleMessageChange = (e) =>{
+    setMessage(e.target.value)
+    
+    if(!myselfTyping){
+      socket.emit("start_typing",{members , chatId})
+      myselfTyping(true)
+    }
+
+    if(typingTimeout.current) clearTimeout(typingTimeout.current)
+
+    typingTimeout.current = setTimeout(()=>{
+      socket.emit("stop_typing",{members , chatId})
+      setMyselfTyping(false)
+    },[2000])
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -52,9 +74,33 @@ const Chat = ({ chatId , user}) => {
       setFileMenuAnchor(e.currentTarget)
   } 
   
+  useEffect(()=>{
+
+    dispatch(removeMessagesAlert(chatId))
+
+     return ()=>{
+      setMessage("")
+      setMessages([])
+      setOldMessages([])
+      setPage(1)
+     }
+  },[chatId])
+
   const newMessageHandler = useCallback((data) => {
+    if(data.chatId !== chatId) return 
     setMessages(prev => [...prev, data.message])
-  }, [])
+  }, [chatId])
+
+  const startTypingListener = useCallback((data) => {
+    if(data.chatId !== chatId) return 
+    console.log("in start typing listener ",data)
+  }, [chatId])
+
+  const stopTypingListener = useCallback((data) => {
+    if(data.chatId !== chatId) return 
+    console.log("in stop typing listener ",data)
+  }, [chatId])
+
 
   // useEffect(()=>{   //one way of listeing to emit emitted from backend
   //   socket.on("new_message",newMessageHandler)
@@ -64,7 +110,7 @@ const Chat = ({ chatId , user}) => {
   //   }
   // },[])
 
-  const eventHandler = { "new_message": newMessageHandler }
+  const eventHandler = { "new_message": newMessageHandler  , "start_typing":startTypingListener , "stop_typing":stopTypingListener}
 
   useSocketEvents(socket, eventHandler)
   useErrors(errors)
@@ -102,7 +148,7 @@ const Chat = ({ chatId , user}) => {
             style={{
               border: '1px solid black ', borderRadius: '40px', outline: 'none', backgroundColor: `${gray}`, width: '100%', marginLeft: '3rem', paddingLeft: '1rem'
             }}
-            value={message} onChange={(e) => setMessage(e.target.value)}
+            value={message} onChange={handleMessageChange}
           />
           <IconButton type='submit' sx={{
             bgcolor: `${orange}`, color: 'white', padding: '0.5rem', "&:hover": { bgcolor: 'error.dark' }, margin: '0.5rem'

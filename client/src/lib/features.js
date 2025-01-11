@@ -1,4 +1,4 @@
-const fileFormat = (url)=>{
+const fileFormat = (url) => {
 
     const fileExt = url.split('.').pop()
 
@@ -10,10 +10,18 @@ const fileFormat = (url)=>{
     return 'file'
 }
 
-const transformImage =(url="",width=100)=> {
+const transformImage = (url="",width=100) => {
    const newUrl = url.replace("upload/",`upload/dpr_auto/w_${width}/`)
 
     return newUrl
 };
 
-export {fileFormat , transformImage}
+const getOrSaveFromLocalStorage = ({key,value,get}) => {
+       if(get){
+        return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : null
+       }else{
+        localStorage.setItem(key,JSON.stringify(value))
+       }
+}
+
+export {fileFormat , transformImage , getOrSaveFromLocalStorage}

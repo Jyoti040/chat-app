@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState } from 'react'
-import { AppBar, Backdrop, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material'
+import { AppBar, Backdrop, Badge, Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material'
 import { orange } from '../../constants/colors'
 import { Add, Group, Logout, Menu, NotificationAdd, Notifications, Person, Search as SearchIcon } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { userNotExists } from '../../redux/reducers/auth'
 import { setIsMobile, setIsNotification, setIsSearch } from '../../redux/reducers/misc'
+import { resetNotification } from '../../redux/reducers/chat.js'
 
 const SearchDialog = lazy(()=>import('../specific/Search'))
 const NotificationsDialog= lazy(()=>import('../specific/Notifications'))
@@ -17,6 +18,7 @@ const NewGroupDialog = lazy(()=>import('../specific/NewGroup'))
 const Header = () => {
     const navigate = useNavigate()
    const {isSearch , isNotification} = useSelector((state)=>state.misc)
+   const {notificationCount} = useSelector((state)=>state.chat)
     const [isNewGorup,setIsNewGorup]=useState(false)
     const dispatch = useDispatch()
 
@@ -38,6 +40,7 @@ const Header = () => {
 
     const openNotifications = () => {
         dispatch(setIsNotification(true))
+        dispatch(resetNotification())
         console.log('in notifications')        
     }
     
@@ -81,7 +84,7 @@ const Header = () => {
                         <IconBtn  title={'Search a user'} Icon={<SearchIcon />} func={openSearchDiagloue}/>
                         <IconBtn  title={'New Group'} Icon={<Add />} func={openNewGroup}/>
                         <IconBtn  title={'Manage Groups'} Icon={<Group />} func={navigateToGroups}/>
-                        <IconBtn  title={'Notifications'} Icon={<Notifications />} func={openNotifications}/>
+                        <IconBtn  title={'Notifications'} Icon={<Notifications />} func={openNotifications} value={notificationCount}/>
                         <IconBtn  title={'My Profile'} Icon={<Person />} func={handleGoToProfile}/>
                         <IconBtn  title={'Logout'} Icon={<Logout />} func={handleLogout}/>
                         {/* <Tooltip title='Search a user'>
@@ -123,11 +126,13 @@ const Header = () => {
     )
 }
 
-const IconBtn = ({ title, Icon, func}) => {
+const IconBtn = ({ title, Icon, func ,value}) => {
     return (
         <Tooltip title={title}>
             <IconButton color='inherit' size='large' onClick={func}>
-                {Icon}
+               {
+                value ? <Badge badgeContent={value} color='error'>{Icon}</Badge> : {Icon}
+               }
             </IconButton>
         </Tooltip>
     )

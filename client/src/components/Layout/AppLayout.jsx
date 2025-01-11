@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import Header from './Header'
 import Title from '../Shared/Title'
 import { Drawer, Grid, Skeleton } from '@mui/material'
@@ -8,9 +8,11 @@ import { useMyChatsQuery } from '../../redux/api/api'
 import { useDispatch, useSelector } from 'react-redux'
 import { setIsMobile } from '../../redux/reducers/misc'
 import toast from 'react-hot-toast'
-import { useErrors } from '../../hooks/hooks'
+import { useErrors, useSocketEvents } from '../../hooks/hooks'
 import Profile from '../specific/Profile'
 import { getSocket } from '../../socket'
+import { incrementNotification, setNewMessagesAlert } from '../../redux/reducers/chat.js'
+import { getOrSaveFromLocalStorage } from '../../lib/features.js'
 
 const sampleChats=[
   {
@@ -28,12 +30,17 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
     const params = useParams()
     const {isMobile} = useSelector((state)=>state.misc)
     const {user} = useSelector((state)=>state.auth)
+    const {newMessageAlert} = useSelector((state)=>state.chat)
     const dispatch = useDispatch()
     const chatID= params.chatID;
 
     const socket = getSocket()
 
     const {isLoading , data , isError , error , refetch} = useMyChatsQuery("")
+
+    useEffect(()=>{
+      getOrSaveFromLocalStorage({key:"new_message_alert",value:newMessageAlert})
+    },[newMessageAlert])
 
     const handleDeleteChat=(e,_id,groupchat)=>{
       e.preventDefault();
@@ -50,7 +57,20 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
     //    }
     // },[isError , error ])
 
+    const newMessageAlertHandler = useCallback((data)=>{
+      if(data.chatId === chatID) return 
+       dispatch(setNewMessagesAlert(data))
+    },[chatID])
+
+    const newRequestHandler = useCallback(()=>{
+      dispatch(incrementNotification())
+    },[dispatch])
+
+    const eventHandlers = { "new_message_alert": newMessageAlertHandler ,  "new_request": newRequestHandler }
+
+    useSocketEvents(socket, eventHandlers) 
     useErrors([{isError,error}])
+
     return (
         <>
             <Title/>
@@ -60,7 +80,7 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
               isLoading ? (<Skeleton/>):(
                 <Drawer open={isMobile} onClose={handleMobileClose}>
                    <ChatLists
-                         chats={data?.chats} chatID={chatID} handleDeleteChat={handleDeleteChat}
+                         chats={data?.chats} chatID={chatID} handleDeleteChat={handleDeleteChat} newMessagesAlert={newMessageAlert}
                     />
                 </Drawer>
               )
@@ -78,7 +98,7 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
                     {
                       isLoading ? (<Skeleton/>):(
                         <ChatLists
-                         chats={data?.chats} chatID={chatID} handleDeleteChat={handleDeleteChat}
+                         chats={data?.chats} chatID={chatID} handleDeleteChat={handleDeleteChat} newMessagesAlert={newMessageAlert}
                         />
                       )
                     }
