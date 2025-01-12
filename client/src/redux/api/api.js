@@ -16,6 +16,14 @@ const api=createApi({
            providesTags:["Chat"]  // to invalidate data , so data refetched and new cache
        }),
 
+       myGroups : builder.query({ 
+           query:()=>({
+            url:"chat/my-groups",
+            credentials:"include"
+           }),
+           providesTags:["Chat"]  
+       }),
+
        searchUser : builder.query({
         query:(name)=>({
             url:`user/search-user?name=${name}`,
@@ -28,6 +36,19 @@ const api=createApi({
         query:({chatId , populate=false})=>{
            let url=`chat/${chatId}`
            if(populate) url+="?populate=true"
+
+           return {
+                url,
+                credentials:"include"
+            }
+        },
+        providesTags:["Chat"]
+       }),
+
+       availableFriends : builder.query({
+        query:(chatId)=>{
+           let url="user/friends"
+           if(chatId) url+=`?chatId=${chatId}`
 
            return {
                 url,
@@ -93,5 +114,7 @@ export const {
     useAcceptFriendRequestMutation ,
     useChatDetailsQuery,
     useGetMessagesQuery,
-    useSendAttachmentsMutation
+    useSendAttachmentsMutation,
+    useMyGroupsQuery,
+    useAvailableFriendsQuery
 } = api

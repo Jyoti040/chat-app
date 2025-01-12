@@ -8,7 +8,7 @@ import { server } from '../../constants/config'
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { userNotExists } from '../../redux/reducers/auth'
-import { setIsMobile, setIsNotification, setIsSearch } from '../../redux/reducers/misc'
+import { setIsMobile, setIsNotification, setIsSearch , setIsNewGroup} from '../../redux/reducers/misc'
 import { resetNotification } from '../../redux/reducers/chat.js'
 
 const SearchDialog = lazy(()=>import('../specific/Search'))
@@ -17,9 +17,9 @@ const NewGroupDialog = lazy(()=>import('../specific/NewGroup'))
 
 const Header = () => {
     const navigate = useNavigate()
-   const {isSearch , isNotification} = useSelector((state)=>state.misc)
+   const {isSearch , isNotification , isNewGorup} = useSelector((state)=>state.misc)
    const {notificationCount} = useSelector((state)=>state.chat)
-    const [isNewGorup,setIsNewGorup]=useState(false)
+
     const dispatch = useDispatch()
 
     const openSearchDiagloue = () => {
@@ -29,7 +29,7 @@ const Header = () => {
     }
 
     const openNewGroup = () => {
-        setIsNewGorup((prev)=>!prev)
+        dispatch(setIsNewGroup(true))
         console.log('in new grp')
     }
     
@@ -63,6 +63,7 @@ const Header = () => {
     const handleMobile=()=>{
         dispatch(setIsMobile(true))
     }
+
     return (
        <>
            <Box sx={{ flexGrow: 1, height: "4rem" }}>

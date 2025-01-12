@@ -1,13 +1,29 @@
-import { Button, Dialog, DialogTitle, Stack, TextField, Typography } from '@mui/material'
+import { Button, Dialog, DialogTitle, Skeleton, Stack, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { sampleUsers } from '../../constants/sampleData'
 import UserItem from './UserItem'
+import { useDispatch, useSelector } from 'react-redux'
+import { useAvailableFriendsQuery } from '../../redux/api/api'
+import { useErrors } from '../../hooks/hooks'
+import { setIsNewGroup } from '../../redux/reducers/misc'
+import toast from 'react-hot-toast'
 
 const NewGroup = () => {
-  const [users, setUsers] = useState(sampleUsers)
+ 
   const [groupName, setGroupName] = useState("")
-  const [members,setMembers] = useState(sampleUsers)
   const [selectedMembers,setSelectedMembers ]= useState([])
+
+  const dispatch = useDispatch()
+
+  const {isNewGroup} = useSelector(state=>state.misc)
+
+  const {isError , error , isLoading , data} = useAvailableFriendsQuery()
+
+  const errors = [
+    {isError , error }
+  ]
+
+  useErrors(errors)
 
   const selectMemberHandler = (id) => {
     console.log('in select member handler ')
@@ -19,11 +35,20 @@ const NewGroup = () => {
   console.log(selectedMembers)
 
   const submitHandler = () => {
+    if(groupName.length<1) return toast.error("Group name is required")
+    if(selectedMembers.length<2) return toast.error("Group must have atleast 3 members")
+
     console.log('in select member handler ')
+    
+    closeHandler()
+  }
+
+  const closeHandler = () => {
+    dispatch(setIsNewGroup(false))
   }
 
   return (
-    <Dialog open>
+    <Dialog open={isNewGroup} onClose={closeHandler}>
       <Stack p={{ xs: '1rem', sm: '2rem' }} width={"25rem"}>
         <DialogTitle textAlign={"center"}>New Group</DialogTitle>
 
@@ -31,8 +56,8 @@ const NewGroup = () => {
 
         <Typography paddingTop={"1rem"} paddingBottom={"1rem"} variant='h6'>Members</Typography>
 
-        {
-          users.map((user) => (
+        { isLoading ? <Skeleton/> :
+          data?.friends?.map((user) => (
             <UserItem
               user={user} key={user._id} handler={selectMemberHandler} isAdded={selectedMembers.includes(user._id)}
             />
@@ -40,7 +65,7 @@ const NewGroup = () => {
         }
 
         <Stack direction={"row"} sx={{display:'flex' , justifyContent:'space-evenly' , marginTop:'1rem'}}>
-           <Button variant='text' color='error'>Cancel</Button>
+           <Button variant='text' color='error' onClick={closeHandler}>Cancel</Button>
            <Button variant='contained' onClick={submitHandler}>Create</Button>
         </Stack>
       </Stack>

@@ -13,11 +13,13 @@ import {useInfiniteScrollTop} from "6pp"
 import { useDispatch } from 'react-redux';
 import { setIsFileMenu } from '../redux/reducers/misc';
 import { removeMessagesAlert } from '../redux/reducers/chat.js';
+import { TypingLoader } from '../components/Layout/Loaders.jsx';
 
 const Chat = ({ chatId , user}) => {
 
   const containerRef = useRef(null);
   const typingTimeout = useRef(null);
+  const bottomRef = useRef(null);
 
   const dispatch = useDispatch()
 
@@ -75,8 +77,7 @@ const Chat = ({ chatId , user}) => {
   } 
   
   useEffect(()=>{
-
-    dispatch(removeMessagesAlert(chatId))
+     dispatch(removeMessagesAlert(chatId))
 
      return ()=>{
       setMessage("")
@@ -86,6 +87,10 @@ const Chat = ({ chatId , user}) => {
      }
   },[chatId])
 
+  useEffect(()=>{   //makes sure as new messages come , the scroller is always at bottom
+    if(bottomRef.current) bottomRef.current.scrollIntoView({ behavior : "smooth"})
+  },[messages])
+
   const newMessageHandler = useCallback((data) => {
     if(data.chatId !== chatId) return 
     setMessages(prev => [...prev, data.message])
@@ -93,14 +98,28 @@ const Chat = ({ chatId , user}) => {
 
   const startTypingListener = useCallback((data) => {
     if(data.chatId !== chatId) return 
+    setUserTyping(true)
     console.log("in start typing listener ",data)
   }, [chatId])
 
   const stopTypingListener = useCallback((data) => {
     if(data.chatId !== chatId) return 
+    setUserTyping(false)
     console.log("in stop typing listener ",data)
   }, [chatId])
 
+  // const alertListener = useCallback((content) => {
+  //   const messageForAlert = {
+  //     content,
+  //     _id:uuid(),
+  //     sender : {
+  //         _id : user._id,
+  //         name : user.name
+  //     },
+  //     chat : chatId,
+  //     createdAt: new Date().toISOString()
+  //    }
+  // }, [])
 
   // useEffect(()=>{   //one way of listeing to emit emitted from backend
   //   socket.on("new_message",newMessageHandler)
@@ -110,7 +129,12 @@ const Chat = ({ chatId , user}) => {
   //   }
   // },[])
 
-  const eventHandler = { "new_message": newMessageHandler  , "start_typing":startTypingListener , "stop_typing":stopTypingListener}
+  const eventHandler = {
+     "new_message": newMessageHandler  , 
+     "start_typing":startTypingListener , 
+     "stop_typing":stopTypingListener ,
+    //  "alert":alertListener
+    }
 
   useSocketEvents(socket, eventHandler)
   useErrors(errors)
@@ -132,6 +156,12 @@ const Chat = ({ chatId , user}) => {
         {
           allMessages.map((msg) => <MessageComponent message={msg} user={user} key={msg._id}/>)
         }
+
+        {
+          userTyping && <TypingLoader/>
+        }
+
+        <div ref={bottomRef}/>
 
       </Stack>
 

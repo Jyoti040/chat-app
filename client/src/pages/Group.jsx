@@ -6,6 +6,9 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AvatarCard from '../components/Shared/AvatarCard'
 import { sampleChats, sampleUsers } from '../constants/sampleData'
 import UserItem from '../components/Shared/UserItem'
+import { useMyGroupsQuery } from '../redux/api/api'
+import { useErrors } from '../hooks/hooks'
+import { LoaderLayout } from '../components/Layout/Loaders'
 //import { StyledLink } from '../styles/StyledComponents'
 
 // const chatID='abcd' //sample
@@ -24,6 +27,14 @@ const Group = () => {
   const navigate = useNavigate()
 
   const chatID = useSearchParams()[0].get('group')
+
+  const myGroups = useMyGroupsQuery("")
+
+  const errors = [
+    { isError : myGroups.isError , errors : myGroups.error}
+  ]
+
+  useErrors(errors)
 
   const navigateBack = () => {
     navigate('/')
@@ -60,7 +71,7 @@ const Group = () => {
     console.log(id, 'in remove add member')
   }
 
-  return (
+  return myGroups.isLoading ? <LoaderLayout/> : (
     <Grid container height={"100vh"}>
       <Grid item
         sx={{

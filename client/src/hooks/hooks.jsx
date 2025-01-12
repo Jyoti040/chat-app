@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 
-const useErrors=(errors=[])=>{
+const useErrors = (errors=[]) => {
    useEffect(()=>{
     errors.forEach(({isError,error,fallback})=>{
       if(isError){
@@ -12,7 +12,7 @@ const useErrors=(errors=[])=>{
    },[errors])
 }
 
-const useAsyncMutation = (mutationHook)=>{
+const useAsyncMutation = (mutationHook) => {
     const [isLoading , setIsLoading] = useState(false)
     const [data , setData] = useState(null)
 
@@ -46,7 +46,7 @@ const useAsyncMutation = (mutationHook)=>{
     return [executeMutation , isLoading , data]
 }
 
-const useSocketEvents = (socket,handlers)=>{   //handlers - object with event name as key and callback func as value
+const useSocketEvents = (socket,handlers) => {   //handlers - object with event name as key and callback func as value
     useEffect(()=>{
       Object.entries(handlers).forEach(([event,handler])=>{
          socket.on(event,handler)
