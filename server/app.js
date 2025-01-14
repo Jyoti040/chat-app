@@ -12,6 +12,8 @@ const io = new Server(server,{
   cors:corsOptions
 })
 
+app.set("io",io)  // can access io from req.app.get("io")
+
 const connectDB = require('./db/connect')
 const cookieParser = require('cookie-parser')
 const {v4} = require("uuid")
@@ -28,11 +30,12 @@ const Message = require('./models/message.js')
 const { socketAuthenticator } = require('./middlewares/Auth.js')
 
 app.use(cors(corsOptions))
-app.use(express.json()) // access json data sent in req.body
 app.use(cookieParser())
+app.use(express.json()) // access json data sent in req.body
+// app.use(express.urlencoded())
 
-app.use('api/v1/user',userRoutes)
-app.use('api/v1/chat',chatRoutes)
+app.use('/api/v1/user',userRoutes)
+app.use('/api/v1/chat',chatRoutes)
 
 app.get('/',(req,res)=>{
       res.send('Welcome to chat app')
@@ -59,7 +62,10 @@ io.on("connection",(socket)=>{
        const messageForRealTime = {
         content:message,
         _id:uuid(),
-        sender : user,
+        sender : {
+            _id : user._id,
+            name : user.name
+        },
         chat : chatId,
         createdAt: new Date().toISOString()
        }
@@ -83,6 +89,18 @@ io.on("connection",(socket)=>{
 
        await Message.create(messageForDB)
        console.log("New message ",messageForRealTime)
+    })
+
+    socket.on("start_typing",({members , chatId})=>{
+        const memberSockets = getSockets(members)
+
+        socket.to(memberSockets).emit("start_typing",{chatId})
+    })
+
+    socket.on("stop_typing",({members , chatId})=>{
+        const memberSockets = getSockets(members)
+
+        socket.to(memberSockets).emit("stop_typing",{chatId})
     })
 
     socket.on("disconnect",()=>{

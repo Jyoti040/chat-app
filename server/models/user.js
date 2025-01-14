@@ -62,8 +62,8 @@ userSchema.pre('save',async function(next){
 })
 
 userSchema.methods.generateJWTToken = function(){
-  return jwt.sign({
-    ID:this.id,
+  const token =  jwt.sign({
+    ID:this._id,
     userName:this.userName,
   },
   process.env.JWT_SECRET,
@@ -71,6 +71,8 @@ userSchema.methods.generateJWTToken = function(){
     expiresIn : process.env.JWT_LIFETIME
   }
 )
+console.log("in generate token ",token)
+  return token;
 }
 
 userSchema.methods.comparePassword = async function(password) {

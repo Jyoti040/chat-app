@@ -255,7 +255,8 @@ const sendAttachments = async(req,res,next)=>{
         const messageForDB ={ content : "" , attachments , sender : user._id , chat : chatId}
 
         const message = await Message.create(messageForDB)
-        emitEvent(req,"new_attachment",chat.members,{
+
+        emitEvent(req,"new_message",chat.members,{
             message:messageForRealTime,
             chatId
         })

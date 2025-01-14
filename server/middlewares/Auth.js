@@ -21,7 +21,7 @@ const verifyUser = async(req,res,next)=>{
         next()
         
     } catch (error) {
-        
+        next(error)
     }
 }
 
@@ -29,7 +29,7 @@ const socketAuthenticator =async (err,socket,next)=>{
     try {
         if(err) return next(err)
         
-        const authToken = socket.request.cookies.authToken 
+        const authToken = socket.request?.cookies?.authToken 
         if(!authToken){
             throw new CustomAPIError("Please login first to access this route" , 401);
         }
@@ -44,7 +44,8 @@ const socketAuthenticator =async (err,socket,next)=>{
         return next()
 
     } catch (error) {
-        throw new CustomAPIError("Please login first to access this route" , 401);
+        // throw new CustomAPIError("Please login first to access this route" , 401);
+        next(error)
     }
 }
 

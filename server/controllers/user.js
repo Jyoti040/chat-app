@@ -13,25 +13,26 @@ const createUserToken = async(ID , next) =>{
             if(!user){
                 throw new CustomAPIError("Invalid user id ",404)
             }
-
             const token = user.generateJWTToken()
             if(!token){
                 throw new CustomAPIError("Error while generating user token ",500)
             }
+            console.log("in create token , token- ",token)
             user.token = token
             await user.save({validateBeforeSave : false})
             return token 
 
         } catch (error) {
-            next(token)
+            next(error)
         }   
 }
 
 const registerUser = async(req,res,next)=>{   
   try {
-     const {name , userName , userEmail, password , bio  } = req.body
+     const {name , userName , userEmail, password , bio } = req.body
 
-     uploadToCloudinary(req,res,next)
+    // req.file=image
+    
     //  if([name, userName , userEmail , password , bio ].some((field)=>field?.trim()==="")){
     //     throw new CustomAPIError('Please provide all the details',400)
     // }
@@ -40,7 +41,9 @@ const registerUser = async(req,res,next)=>{
 
     // const result = await uploadToCloudinary(file)
 
-    const avatar = req.avatar
+    console.log("in register user ",req.file?.path)
+    const avatar =  await uploadToCloudinary(req.file?.path)
+    console.log('in register user' , avatar)
     //  {
     //     public_id:result.public_id,
     //     url:result.url
@@ -63,10 +66,10 @@ const registerUser = async(req,res,next)=>{
     const createdUser = await User.findById(newUser._id)
 
     if(!createdUser){
-       throw new CustomAPIError("Somehthing went wrong while registering user")
+       throw new CustomAPIError("Something went wrong while registering user")
    }
 
-   const token = await createUserToken(createdUser._id) 
+   const token = await createUserToken(createdUser._id,next) 
 
 //    const options = {
 //     maxAge:15*24*60*60*1000, // 15 days

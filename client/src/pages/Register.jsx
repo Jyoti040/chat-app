@@ -3,7 +3,7 @@ import React ,{ useState} from 'react'
 import { CameraAlt , VisibilityOff , Visibility  } from '@mui/icons-material'
 import { VisuallyHiddenInput } from '../components/styles/StyledComponents'
 import { Link } from 'react-router-dom'
-import { handlePassword } from '../utils/validators'
+// import { handlePassword } from '../utils/validators'
 import axios from 'axios'
 import { server } from '../constants/config'
 import { useDispatch } from 'react-redux'
@@ -30,6 +30,7 @@ const [password , setPassword] = useState("")
 const [passwordValidateMessage,setPasswordValidateMessage] = useState('')
 const [bio , setBio] = useState("")
 const [image , setImage] = useState(null)
+const [imageToSend , setImageToSend] = useState(null)
 const dispatch = useDispatch()
 
 const togglePasswordVisibility=()=>{
@@ -38,13 +39,45 @@ const togglePasswordVisibility=()=>{
 
 const handleImage=(e)=>{
    const file=e.target.files[0];
+   setImageToSend(file)
    if(file){
     const reader = new FileReader();
     reader.onload=()=>{
         setImage(reader.result)
+        console.log("in handle image ",reader)
     }
     reader.readAsDataURL(file) // set url of file
+    console.log("in handle image 1",reader)
+    console.log("in handle image 2 ",file)
    }
+// setImage(file)
+}
+
+const handlePassword = (e)=>{
+    let tempPassword=e.target.value;
+    setPassword(tempPassword)
+
+    var lowerCase=/[a-z]/g;
+    var upperCase=/[A-Z]/g;
+    var digit=/\d/;
+    var minLength=/.{8,}/;
+
+    if(!minLength.test(password)) {
+        setPasswordValidateMessage("Password must have atleast 8 characters");
+        return;
+    }else if(!digit.test(password)){
+        setPasswordValidateMessage("Password must have atleast 1 digit");
+        return;
+    }else if(!upperCase.test(password)){
+        setPasswordValidateMessage("Password must have atleast 1 uppercase letter");
+        return;
+    }else if(!lowerCase.test(password)){
+        setPasswordValidateMessage("Password must have atleast 1 lowercase letter ");
+        return;
+    }else{
+        setPasswordValidateMessage("")
+        return;
+    }
 }
 
 const handleRegister = async(e)=>{
@@ -52,9 +85,9 @@ const handleRegister = async(e)=>{
 
     const config ={
         withCredentials:true , 
-        headers:{
-            "Content-Type":"multipart/form-data"
-        }
+        // headers:{
+        //     "Content-Type":"multipart/form-data"
+        // }
     }
 
     const formData = new FormData()
@@ -63,13 +96,14 @@ const handleRegister = async(e)=>{
     formData.append("userEmail",email)
     formData.append("password",password)
     formData.append("bio",bio)
-    formData.append("avatar",image)
+    formData.append("avatar",imageToSend)
 
    try {
     const {data} = await axios.post(`${server}/api/v1/user/register`,formData,config)
     dispatch(userExists(true))
     toast.success(data.message)
    } catch (error) {
+    console.log("in register user ",error)
     toast.error(error?.response?.data?.message || "Something went wrong")
    }
 }

@@ -1,29 +1,40 @@
  const CustomAPIError = require('../errors/CustomError')
-const {cloudinary} = require('./cloudinary')
+const { getSockets } = require('../lib/helper')
+const cloudinary = require('./cloudinary')
 const {v4 } = require("uuid")
 
 const emitEvent = (req,event,users,data)=>{
+        const io = req.app.get("io")
+        const userSockets = getSockets(members)
+        io.to(userSockets).emit(event,data)
         console.log("emitting event " , event)
 }
 
-const uploadToCloudinary = async(req,res,next)=>{
+const uploadToCloudinary = async(file)=>{
        try {
-        if(!req.file){
-                throw new CustomAPIError("Please upload an avatar",400)
+        if(!file){
+              throw new CustomAPIError("Please upload an avatar",400)
         }
-        const result = await cloudinary.uploader.upload(req.file.path,{
+
+        const result = await cloudinary.uploader.upload(file,{
                 resource_type:"auto",
                 public_id:v4()
         })
-        req.avatar={
+        console.log('in upload to cloudinary ',result)
+        const avatar =  {
          public_id : result.public_id,
          url:result.secure_url
-        }
-         next()
-       } catch (error) {
-        next(error)
+        }   
+        console.log("avatar after uploading ",avatar)
+        return avatar;
+       }
+          
+       catch (error) {
+        console.log("in cloudinary upload ",error)
+        throw new CustomAPIError("Failed to upload avatar in cloudinary",400)
        }
 }
+
 const deleteFilesFromCloudinary = async(public_ids)=>{
 
 }

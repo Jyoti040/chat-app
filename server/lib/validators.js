@@ -4,9 +4,9 @@ const CustomAPIError = require("../errors/CustomError")
 const validateHandler = (req, res, next) => {  // this func will be called if above cnds are violated
     try {
         const error = validationResult(req)
-        console.log("in login user validator ", error)
+        console.log("user validator ", error)
 
-        const errorMessage = error.mapped((e) => e.msg).join(" , ")
+        const errorMessage = error.errors.map((e) => e.msg).join(" , ")
 
         if (error.isEmpty()) return next()
         else throw new CustomAPIError(errorMessage, 400)
