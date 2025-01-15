@@ -3,8 +3,8 @@ import React, { useState } from 'react'
 import { sampleUsers } from '../../constants/sampleData'
 import UserItem from './UserItem'
 import { useDispatch, useSelector } from 'react-redux'
-import { useAvailableFriendsQuery } from '../../redux/api/api'
-import { useErrors } from '../../hooks/hooks'
+import { useAvailableFriendsQuery, useNewGroupMutation } from '../../redux/api/api'
+import { useAsyncMutation, useErrors } from '../../hooks/hooks'
 import { setIsNewGroup } from '../../redux/reducers/misc'
 import toast from 'react-hot-toast'
 
@@ -19,6 +19,8 @@ const NewGroup = () => {
 
   const {isError , error , isLoading , data} = useAvailableFriendsQuery()
 
+  const [newGroup , isLoadingNewGroup ] = useAsyncMutation(useNewGroupMutation)
+
   const errors = [
     {isError , error }
   ]
@@ -32,14 +34,17 @@ const NewGroup = () => {
     setSelectedMembers(prev=> prev.includes(id) ? prev.filter((currID)=> currID !== id) : [...prev,id])
    
   }
+
   console.log(selectedMembers)
 
   const submitHandler = () => {
+    console.log('in select member handler ')
+
     if(groupName.length<1) return toast.error("Group name is required")
     if(selectedMembers.length<2) return toast.error("Group must have atleast 3 members")
 
-    console.log('in select member handler ')
-    
+    newGroup("Creating new group ... ",{name : groupName , members:selectedMembers})
+
     closeHandler()
   }
 
@@ -66,7 +71,7 @@ const NewGroup = () => {
 
         <Stack direction={"row"} sx={{display:'flex' , justifyContent:'space-evenly' , marginTop:'1rem'}}>
            <Button variant='text' color='error' onClick={closeHandler}>Cancel</Button>
-           <Button variant='contained' onClick={submitHandler}>Create</Button>
+           <Button variant='contained' onClick={submitHandler} disabled={isLoadingNewGroup}>Create</Button>
         </Stack>
       </Stack>
     </Dialog>

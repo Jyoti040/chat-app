@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { setIsFileMenu } from '../redux/reducers/misc';
 import { removeMessagesAlert } from '../redux/reducers/chat.js';
 import { TypingLoader } from '../components/Layout/Loaders.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const Chat = ({ chatId , user}) => {
 
@@ -22,6 +23,7 @@ const Chat = ({ chatId , user}) => {
   const bottomRef = useRef(null);
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
@@ -38,6 +40,10 @@ const Chat = ({ chatId , user}) => {
   const {data:oldMessages , setData:setOldMessages} = useInfiniteScrollTop(  
     containerRef , oldMessagesChunk.data?.totalPages , page , setPage , oldMessagesChunk.data?.messages
   )
+
+  useEffect(()=>{
+     if(!chatDetails?.data?.chat) return navigate("/")
+  },[chatDetails.data])
 
   const errors = [
     {isError : chatDetails.isError , error : chatDetails.error},

@@ -1,27 +1,32 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import Header from './Header'
 import Title from '../Shared/Title'
 import { Drawer, Grid, Skeleton } from '@mui/material'
 import ChatLists from '../specific/ChatLists'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useMyChatsQuery } from '../../redux/api/api'
 import { useDispatch, useSelector } from 'react-redux'
-import { setIsMobile } from '../../redux/reducers/misc'
+import { setIsDeleteMenu, setIsMobile } from '../../redux/reducers/misc'
 import toast from 'react-hot-toast'
 import { useErrors, useSocketEvents } from '../../hooks/hooks'
 import Profile from '../specific/Profile'
 import { getSocket } from '../../socket'
 import { incrementNotification, setNewMessagesAlert } from '../../redux/reducers/chat.js'
 import { getOrSaveFromLocalStorage } from '../../lib/features.js'
+import DeleteChatMenu from '../dialog/DeleteChatMenu.jsx'
 
 const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
   return (props)=>{
 
+    const dispatch = useDispatch()
     const params = useParams()
+    const navigate = useNavigate()
+    const deleteMenuAnchor = useRef(null)
+
     const {isMobile} = useSelector((state)=>state.misc)
     const {user} = useSelector((state)=>state.auth)
     const {newMessageAlert} = useSelector((state)=>state.chat)
-    const dispatch = useDispatch()
+
     const chatID= params.chatID;
 
     const socket = getSocket()
@@ -33,8 +38,10 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
     },[newMessageAlert])
 
     const handleDeleteChat=(e,_id,groupchat)=>{
-      e.preventDefault();
       console.log('in delete chat')
+      e.preventDefault();
+      dispatch(setIsDeleteMenu(true))
+      deleteMenuAnchor.current = e.curretTarget
     }
 
     const handleMobileClose=()=>{
@@ -56,7 +63,16 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
       dispatch(incrementNotification())
     },[dispatch])
 
-    const eventHandlers = { "new_message_alert": newMessageAlertHandler ,  "new_request": newRequestHandler }
+    const refetchChatHandler = useCallback(()=>{
+      refetch()
+      navigate("/")
+    },[refetch , navigate])
+
+    const eventHandlers = {  //event listeners
+      "new_message_alert": newMessageAlertHandler ,
+      "new_request": newRequestHandler ,
+      "refetch_chats": refetchChatHandler ,
+      }
 
     useSocketEvents(socket, eventHandlers) 
     useErrors([{isError,error}])
@@ -65,6 +81,8 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
         <>
             <Title/>
             <Header/>
+
+            <DeleteChatMenu dispatch={dispatch} deleteMenuAnchor={deleteMenuAnchor}/>
 
             {
               isLoading ? (<Skeleton/>):(

@@ -23,7 +23,7 @@ const useAsyncMutation = (mutationHook) => {
        const toastId = toast.loading(toastMessage || "Updating data ")
 
        try {
-        const res=await sendFriendRequest(...args)
+        const res=await mutate(...args)
         if(res.data){
           toast.success(res?.data?.message || "Data updated successfully",{
             id:toastId
