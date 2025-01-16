@@ -151,20 +151,19 @@ const removeMember= async(req,res,next)=>{
         if(!chat.groupChat){
             throw new CustomAPIError("Not a group chat found",400)
         }
-
         if(chat.creator.toString() !== req.user.toString()) {
             throw new CustomAPIError("You are not allowed to delete members",403)
         }
-
         if(chat.members.length<=3){
             throw new CustomAPIError("Group must have atleast 3 members",400)
         }
-
+         
+        const allMembers = chat.members.map((member)=>member.toString())
         chat.members = chat.members.filter((member)=>member._id.toString() !== userId.toString()) 
         await chat.save()
 
         emitEvent(req,'alert',chat.members,`${user.name} is no longer part of the group`)
-        emitEvent(req,'fetch chats',chat.members)
+        emitEvent(req,'refetch_chats',allMembers)
 
         return res.status(200).json({
             success:true ,
@@ -211,7 +210,7 @@ const leaveGroup = async(req,res,next)=>{
 
         return res.status(200).json({
             success:true ,
-            message:"Member left the group successfully"
+            message:"Group left successfully"
         })
 
     } catch (error) {
@@ -398,6 +397,15 @@ const getMessages = async(req,res,next)=>{
         const limit = 20 // per page limit 
 
         const skip = (page-1) * limit
+
+        const chat = await Chat.findById(chatId)
+
+        if(!chat){
+            throw new CustomAPIError("No chat found",404)
+        }
+        if(!chat.members.includes(req.user.toString())){
+            throw new CustomAPIError("You are not authorised to access this chat ",403)   
+        }
 
         const [messages,totalMessageCount] = await Promise.all([
         Message.find({chat:chatId})

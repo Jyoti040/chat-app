@@ -50,8 +50,6 @@ const userSchema = new mongoose.Schema({
     timestamps:true
 })
 
-const User = mongoose.models.User ||  mongoose.model('User',userSchema)
-
 userSchema.pre('save',async function(next){
     if(!this.isModified("password")){
         return next()
@@ -71,7 +69,7 @@ userSchema.methods.generateJWTToken = function(){
     expiresIn : process.env.JWT_LIFETIME
   }
 )
-console.log("in generate token ",token)
+  console.log("in generate token ",token)
   return token;
 }
 
@@ -79,4 +77,5 @@ userSchema.methods.comparePassword = async function(password) {
   return await bcrypt.compare(password , this.password);
 }
 
+const User = mongoose.model('User',userSchema) 
 module.exports = User

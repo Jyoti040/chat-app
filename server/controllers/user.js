@@ -1,7 +1,7 @@
 const CustomAPIError = require('../errors/CustomError')
 const User = require('../models/user')
 const Request = require('../models/request')
-const cookieOptions = require("../constants/constants")
+const {cookieOptions} = require("../constants/constants")
 const { emitEvent, uploadToCloudinary } = require('../utils/features')
 const Chat = require('../models/chat')
 const { getOtherMember } = require('../lib/helper')
@@ -21,7 +21,6 @@ const createUserToken = async(ID , next) =>{
             user.token = token
             await user.save({validateBeforeSave : false})
             return token 
-
         } catch (error) {
             next(error)
         }   
@@ -69,7 +68,7 @@ const registerUser = async(req,res,next)=>{
        throw new CustomAPIError("Something went wrong while registering user")
    }
 
-   const token = await createUserToken(createdUser._id,next) 
+   const token = await createUserToken(createdUser._id) 
 
 //    const options = {
 //     maxAge:15*24*60*60*1000, // 15 days

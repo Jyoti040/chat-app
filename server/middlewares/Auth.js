@@ -29,7 +29,8 @@ const socketAuthenticator =async (err,socket,next)=>{
     try {
         if(err) return next(err)
         
-        const authToken = socket.request?.cookies?.authToken 
+        console.log("in socketAuthenticator ",socket.handshake.headers.cookie.split('=')[1])
+        const authToken = socket.handshake.headers.cookie.split('=')[1]
         if(!authToken){
             throw new CustomAPIError("Please login first to access this route" , 401);
         }

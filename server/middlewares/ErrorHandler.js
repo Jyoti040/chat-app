@@ -17,10 +17,14 @@ const ErrorHandler = (err,req,res,next)=>{
     const statusCode = err.statusCode || 500 
     const message = err.message || 'Something went wrong , please try again later'
 
-    return res.status(statusCode).json({
+    const response = {
         success:false,
-        message: envMode === "DEVELOPMENT"?err:message
-    })
+        message
+    }
+
+    if(envMode==="DEVELOPMENT") response.error = err
+
+    return res.status(statusCode).json(response)
     
 }
 
