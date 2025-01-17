@@ -31,6 +31,8 @@ const [passwordValidateMessage,setPasswordValidateMessage] = useState('')
 const [bio , setBio] = useState("")
 const [image , setImage] = useState(null)
 const [imageToSend , setImageToSend] = useState(null)
+const [loading,setIsLoading] = useState(false)
+
 const dispatch = useDispatch()
 
 const togglePasswordVisibility=()=>{
@@ -83,6 +85,8 @@ const handlePassword = (e)=>{
 const handleRegister = async(e)=>{
     e.preventDefault()
 
+    setIsLoading(true)
+    const toastId = toast.loading("Creating a new account")
     const config ={
         withCredentials:true , 
         // headers:{
@@ -100,11 +104,17 @@ const handleRegister = async(e)=>{
 
    try {
     const {data} = await axios.post(`${server}/api/v1/user/register`,formData,config)
-    dispatch(userExists(true))
-    toast.success(data.message)
+    dispatch(userExists(data.user))
+    toast.success(data.message,{
+        id:toastId
+    })
    } catch (error) {
     console.log("in register user ",error)
-    toast.error(error?.response?.data?.message || "Something went wrong")
+    toast.error(error?.response?.data?.message || "Something went wrong",{
+        id:toastId
+    })
+   }finally{
+    setIsLoading(false)
    }
 }
   return (
@@ -229,7 +239,7 @@ const handleRegister = async(e)=>{
                         </Typography>
                     }    
 
-                    <Button color='primary' variant='contained' fullWidth type='submit' >Sign Up/Register </Button>
+                    <Button color='primary' variant='contained' fullWidth type='submit' disabled={loading} >Sign Up/Register </Button>
 
                     <Typography textAlign={"center"} m={"1rem"}>OR</Typography>
                  <Link to='/login'>
