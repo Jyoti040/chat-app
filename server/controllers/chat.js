@@ -162,7 +162,10 @@ const removeMember= async(req,res,next)=>{
         chat.members = chat.members.filter((member)=>member._id.toString() !== userId.toString()) 
         await chat.save()
 
-        emitEvent(req,'alert',chat.members,`${user.name} is no longer part of the group`)
+        emitEvent(req,'alert',chat.members,{
+            message:`${user.name} is no longer part of the group , is removed`,
+            chatId
+        })
         emitEvent(req,'refetch_chats',allMembers)
 
         return res.status(200).json({
@@ -183,7 +186,6 @@ const leaveGroup = async(req,res,next)=>{
         if(!chat){
             throw new CustomAPIError("No chat found",404)
         }
-
         if(!chat.groupChat){
             throw new CustomAPIError("Not a group chat found",400)
         }
@@ -205,7 +207,10 @@ const leaveGroup = async(req,res,next)=>{
         chat.members = remainingMembers
         const [user] = await Promise.all([User.findById(req.user,"name") , chat.save()])
 
-        emitEvent(req,'alert',chat.members,`${user} has left the group `)
+        emitEvent(req,'alert',chat.members,{
+            message:`${user} has left the group `,
+            chatId
+        })
        
 
         return res.status(200).json({

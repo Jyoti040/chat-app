@@ -4,8 +4,9 @@ const cloudinary = require('./cloudinary')
 const {v4 } = require("uuid")
 
 const emitEvent = (req,event,users,data)=>{
+        console.log("in emit event",users , data)
         const io = req.app.get("io")
-        const userSockets = getSockets(members)
+        const userSockets = getSockets(users)
         io.to(userSockets).emit(event,data)
         console.log("emitting event " , event)
 }

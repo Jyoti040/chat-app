@@ -82,7 +82,7 @@ const registerUser = async(req,res,next)=>{
      .json({
         success:true,
          message : 'User registerd successfully' ,
-         createdUser
+         user:createdUser
      })
 
   } catch (error) {
@@ -111,7 +111,7 @@ const loginUser = async(req,res,next)=>{
             throw new CustomAPIError('Incorrect password',401) 
         }
 
-        const token = await generateUserToken(user._id)
+        const token = await createUserToken(user._id)
         const loggedInUser = await User.findById(user._id)
   
         const options = {
@@ -122,11 +122,9 @@ const loginUser = async(req,res,next)=>{
         return res.status(200)
         .cookie("authToken",token,options)
         .json({
-
-
              success:true,
              user : loggedInUser ,
-            message : 'User logged in successfully'
+             message : 'User logged in successfully'
         })
         
      } catch (error) {
@@ -257,16 +255,17 @@ const acceptFriendRequest = async(req,res,next)=>{
                 message:"Friend request rejected"
             })
         }
-            const members = [request.sender._id , request.receiver._id]
-            await Promise.all([
+
+        const members = [request.sender._id , request.receiver._id]
+        await Promise.all([
                 Chat.create({
                     members, name : `${request.sender.name} - ${request.receiver.name}`
                 }),
                 request.deleteOne()
             ])
         
+        emitEvent(req,"refetch_chats",members)
 
-        emitEvent(req,"refetech_chats",members)
         return res.status(200).json({
             success:true ,
             message:"Friend request accepted",

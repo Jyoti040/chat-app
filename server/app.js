@@ -41,7 +41,8 @@ app.get('/',(req,res)=>{
       res.send('Welcome to chat app')
 })
 
-const userSocketIDs = new Map()  // all members currently connected to socket 
+const userSocketIDs = new Map()  // all members currently connected to socket
+const onlineUsers = new Set() 
 
 io.use((socket , next )=>{
      cookieParser()(socket.request,socket.request.res,
@@ -57,6 +58,7 @@ io.on("connection",(socket)=>{
     const user = socket.user
     console.log("user connected ",socket.id)
     userSocketIDs.set(user._id.toString() , socket.id)
+    console.log("in coonection event emit ",userSocketIDs)
 
     socket.on("NEW_MESSAGE",async ({chatId , members , message})=>{  // emit emiited from frontend / client , to which server are listening here
        const messageForRealTime = {
@@ -103,9 +105,26 @@ io.on("connection",(socket)=>{
         socket.to(memberSockets).emit("stop_typing",{chatId})
     })
 
+   socket.on("chat_joined",({userId , members})=>{
+    onlineUsers.add(userId.toString())
+    const memberSockets = getSockets(members)
+
+    io.to(memberSockets).emit("online_users",Array.from(onlineUsers))
+   })
+
+   socket.on("chat_leaved",({userId , members})=>{
+    onlineUsers.delete(userId.toString())
+
+    const memberSockets = getSockets(members)
+
+    io.to(memberSockets).emit("online_users",Array.from(onlineUsers))
+   })
+
     socket.on("disconnect",()=>{
         userSocketIDs.delete(user._id.toString())
         console.log("user disconnected")
+        onlineUsers.delete(user._id.toString())
+        socket.broadcast.emit("online_users",Array.from(onlineUsers))  // if a person closes window-then should should offline
     })
 })
 
@@ -129,6 +148,7 @@ const start = async () => {
     }
 }
 
-start()
-
+console.log("in app js before export")
 module.exports = { envMode , userSocketIDs }
+
+start()
