@@ -279,14 +279,21 @@ const acceptFriendRequest = async(req,res,next)=>{
 const getAllNotifications=async(req,res,next)=>{
     try {
         const requests = await Request.find({receiver:req.user}).populate("sender","name avatar")
-        const allRequests = requests.map(({_id,sender})=>({
-            _id, sender:{
-                _id:sender._id,
-                name:sender.name,
-                avatar:sender.avatar.url
-            }
-        }))
-
+        const senderUser = await User.findById(requests[0].sender)
+        console.log("in getAllNotifications before all req",requests)
+        console.log("in getAllNotifications before all req sender",senderUser)
+        const allRequests = requests.map((request)=>{
+            console.log("inside map ",request)
+            const sender = request.sender
+            return ({
+               _id: request._id, sender:{
+                    _id:sender._id,
+                    name:sender.name,
+                    avatar:sender.avatar.url
+                }
+            })
+        })
+        console.log("in getAllNotifications after req",allRequests)
         return res.status(200).json({
             success:true,
             allRequests

@@ -1,7 +1,7 @@
 const CustomAPIError = require("../errors/CustomError")
 const Chat = require("../models/chat")
 const {emitEvent, deleteFilesFromCloudinary, uploadToCloudinary} = require("../utils/features")
-const getOtherMember = require("../lib/helper")
+const {getOtherMember} = require("../lib/helper")
 const User = require("../models/user")
 const Message = require("../models/message")
 
@@ -277,6 +277,7 @@ const sendAttachments = async(req,res,next)=>{
 
 const getChatDetails = async(req,res,next)=>{
     try {
+        console.log("in chat details",req.query)
         if(req.query.populate === "true"){  //id?populate=true
            const chatId = req.params.id
            const chat = await Chat.findById(chatId).populate("members","name avatar").lean() // chat becomes now an js object , now an db obj
@@ -284,12 +285,12 @@ const getChatDetails = async(req,res,next)=>{
            if(!chat){
             throw new CustomAPIError("No chat found",404)
         }
-
+        
         chat.members = chat.members.map(({_id,name,avatar})=>({
             _id,name,
             avatar : avatar.url
         }))
-
+        console.log("in get chat details ",chat)
         return res.status(200).json({
             success:true,
             chat
@@ -297,6 +298,8 @@ const getChatDetails = async(req,res,next)=>{
         }else{
             const chatId = req.params.id
             const chat = await Chat.findById(chatId)
+
+            console.log("in get chat details , populate - false",chat)
  
             if(!chat){
              throw new CustomAPIError("No chat found",404)

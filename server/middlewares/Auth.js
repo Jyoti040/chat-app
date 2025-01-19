@@ -29,7 +29,7 @@ const socketAuthenticator =async (err,socket,next)=>{
     try {
         if(err) return next(err)
         
-        console.log("in socketAuthenticator ",socket.handshake.headers.cookie.split('=')[1])
+      //  console.log("in socketAuthenticator ",socket.handshake.headers.cookie.split('=')[1])
         const authToken = socket.handshake.headers.cookie.split('=')[1]
         if(!authToken){
             throw new CustomAPIError("Please login first to access this route" , 401);
@@ -39,14 +39,14 @@ const socketAuthenticator =async (err,socket,next)=>{
         if(!decodedToken){
             throw new CustomAPIError("Invalid token" , 401);
         }
-        console.log("in socket authenticator after decoded token ",decodedToken)
+   //     console.log("in socket authenticator after decoded token ",decodedToken)
         const user = await User.findById(decodedToken?.ID)
         if(!user){
             throw new CustomAPIError("No user found with given token" , 401);
         }
         
         socket.user = user
-        console.log("in socketAuthenticator socket ",socket.user)
+       // console.log("in socketAuthenticator socket ",socket.user)
          next()
 
     } catch (error) {

@@ -25,7 +25,7 @@ const ErrorHandlerMiddleware = require('./middlewares/ErrorHandler.js')
 
 const userRoutes = require('./routes/user')
 const chatRoutes = require('./routes/chat')
-const { getSockets } = require('./lib/helper.js')
+const { getSockets , userSocketIDs , onlineUsers } = require('./lib/helper.js')
 const Message = require('./models/message.js')
 const { socketAuthenticator } = require('./middlewares/Auth.js')
 
@@ -41,8 +41,10 @@ app.get('/',(req,res)=>{
       res.send('Welcome to chat app')
 })
 
-const userSocketIDs = new Map()  // all members currently connected to socket
-const onlineUsers = new Set() 
+// let userSocketIDs = new Map()  // all members currently connected to socket
+// let onlineUsers = new Set() 
+
+
 
 io.use((socket , next )=>{
      cookieParser()(socket.request,socket.request.res,
@@ -148,7 +150,7 @@ const start = async () => {
     }
 }
 
-console.log("in app js before export")
-module.exports = { envMode , userSocketIDs }
+// console.log("in app js before export")
+// module.exports = { envMode , userSocketIDs }
 
 start()

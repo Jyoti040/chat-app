@@ -1,4 +1,7 @@
-const {userSocketIDs} = require('../app.js')
+// const {userSocketIDs} = require('../app.js')
+
+let userSocketIDs = new Map()  // all members currently connected to socket
+let onlineUsers = new Set() 
 
 const getOtherMember = (members , userId)=>{
      return members.find((member)=> member._id.toString() !== userId.toString())
@@ -11,4 +14,4 @@ const getSockets = (users=[]) =>{
      return sockets 
 }
 
-module.exports = { getOtherMember , getSockets}
+module.exports = { getOtherMember , getSockets , userSocketIDs , onlineUsers}

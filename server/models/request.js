@@ -8,12 +8,12 @@ const requestSchema = new mongoose.Schema({
      }, 
      sender : {
       type : mongoose.Types.ObjectId,
-      ref:'Request',
+      ref:'User',
       required:true
      }, 
      receiver : {
       type : mongoose.Types.ObjectId,
-      ref:'Request',
+      ref:'User',
       required:true
      },
 },{
