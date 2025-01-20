@@ -1,7 +1,7 @@
 const CustomAPIError = require('../errors/CustomError')
 const User = require('../models/user')
 const Request = require('../models/request')
-const {cookieOptions} = require("../constants/constants")
+const {cookieOptions, NEW_REQUEST, REFETCH_CHATS} = require("../constants/constants")
 const { emitEvent, uploadToCloudinary } = require('../utils/features')
 const Chat = require('../models/chat')
 const { getOtherMember } = require('../lib/helper')
@@ -220,7 +220,7 @@ const sendFriendRequest = async(req,res,next)=>{
             receiver:userId
         })
 
-        emitEvent(req,"new_request",[userId])
+        emitEvent(req,NEW_REQUEST,[userId])
 
         return res.status(200).json({
             success:true ,
@@ -264,7 +264,7 @@ const acceptFriendRequest = async(req,res,next)=>{
                 request.deleteOne()
             ])
         
-        emitEvent(req,"refetch_chats",members)
+        emitEvent(req,REFETCH_CHATS,members)
 
         return res.status(200).json({
             success:true ,

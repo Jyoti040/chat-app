@@ -4,6 +4,7 @@ const {emitEvent, deleteFilesFromCloudinary, uploadToCloudinary} = require("../u
 const {getOtherMember} = require("../lib/helper")
 const User = require("../models/user")
 const Message = require("../models/message")
+const { NEW_MESSAGE, NEW_MESSAGE_ALERT, REFETCH_CHATS, ALERT } = require("../constants/constants")
 
 const newGroupChat = async(req,res,next)=>{
     try {
@@ -22,8 +23,8 @@ const newGroupChat = async(req,res,next)=>{
             members : allMembers
         })
 
-        emitEvent(req,'Alert',allMembers,`Welcome to ${groupName} group`)
-        emitEvent(req,'Refetch chat',members,``)
+        emitEvent(req,ALERT,allMembers,`Welcome to ${groupName} group`)
+        emitEvent(req,REFETCH_CHATS,members,``)
 
         return res.status(201).json({
             success:true ,
@@ -126,8 +127,8 @@ const addMembers = async(req,res,next)=>{
 
         const allUsersName = uniqueMembers.map((member)=>member.name).join(",") // array to string of anmes sep by comma
 
-        emitEvent(req , 'alert',chat.members,`${allUsersName} have been added to ${chat.name} by ${req.user.name}`)
-        emitEvent(req,'Refetch Chats',chat.members)
+        emitEvent(req ,ALERT,chat.members,`${allUsersName} have been added to ${chat.name} by ${req.user.name}`)
+        emitEvent(req,REFETCH_CHATS,chat.members)
 
         return res.status(200).json({
             success:true,
@@ -162,11 +163,11 @@ const removeMember= async(req,res,next)=>{
         chat.members = chat.members.filter((member)=>member._id.toString() !== userId.toString()) 
         await chat.save()
 
-        emitEvent(req,'alert',chat.members,{
+        emitEvent(req,ALERT,chat.members,{
             message:`${user.name} is no longer part of the group , is removed`,
             chatId
         })
-        emitEvent(req,'refetch_chats',allMembers)
+        emitEvent(req,REFETCH_CHATS,allMembers)
 
         return res.status(200).json({
             success:true ,
@@ -260,11 +261,11 @@ const sendAttachments = async(req,res,next)=>{
 
         const message = await Message.create(messageForDB)
 
-        emitEvent(req,"new_message",chat.members,{
+        emitEvent(req,NEW_MESSAGE,chat.members,{
             message:messageForRealTime,
             chatId
         })
-        emitEvent(req,"new_message_alert",chat.members,{chatId})
+        emitEvent(req,NEW_MESSAGE_ALERT,chat.members,{chatId})
 
         return res.status(200).json({
             success:true,
@@ -278,7 +279,7 @@ const sendAttachments = async(req,res,next)=>{
 const getChatDetails = async(req,res,next)=>{
     try {
         console.log("in chat details",req.query)
-        if(req.query.populate === "true"){  //id?populate=true
+        if(req.query.populate === 'true'){  //id?populate=true
            const chatId = req.params.id
            const chat = await Chat.findById(chatId).populate("members","name avatar").lean() // chat becomes now an js object , now an db obj
 
@@ -296,6 +297,7 @@ const getChatDetails = async(req,res,next)=>{
             chat
         })
         }else{
+            console.log("in get chat details , populate - false before chat ",req.params)
             const chatId = req.params.id
             const chat = await Chat.findById(chatId)
 
@@ -337,7 +339,7 @@ const renameGroup = async(req,res,next)=>{
         chat.name = name 
         await chat.save()
 
-        emitEvent(req,"refetch_chats",chat.members)
+        emitEvent(req,REFETCH_CHATS,chat.members)
 
         return res.status(200).json({
             success:true,
@@ -387,7 +389,7 @@ const deleteChat = async(req,res,next)=>{
             Message.deleteMany({chat:chatId})
         ])
 
-        emitEvent(req,"refetch_chats",members)
+        emitEvent(req,REFETCH_CHATS,members)
 
         return res.status(200).json({
             success:true,

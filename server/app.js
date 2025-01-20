@@ -4,7 +4,7 @@ require('dotenv').config({
 const express = require('express')
 const { Server } = require("socket.io")
 const { createServer } = require("http")
-const { corsOptions } = require('./constants/constants.js')
+const { corsOptions, NEW_MESSAGE, START_TYPING, STOP_TYPING, CHAT_JOINED, ONLINE_USERS, CHAT_LEAVED, NEW_MESSAGE_ALERT } = require('./constants/constants.js')
 
 const app=express()
 const server = createServer(app)
@@ -62,10 +62,10 @@ io.on("connection",(socket)=>{
     userSocketIDs.set(user._id.toString() , socket.id)
     console.log("in coonection event emit ",userSocketIDs)
 
-    socket.on("NEW_MESSAGE",async ({chatId , members , message})=>{  // emit emiited from frontend / client , to which server are listening here
+    socket.on(NEW_MESSAGE,async ({chatId , members , message})=>{  // emit emiited from frontend / client , to which server are listening here
        const messageForRealTime = {
         content:message,
-        _id:uuid(),
+        _id:v4(),
         sender : {
             _id : user._id,
             name : user.name
@@ -82,12 +82,12 @@ io.on("connection",(socket)=>{
         
        const memberSockets = getSockets(members)
        
-       io.to(memberSockets).emit("NEW_MESSAGE",{
+       io.to(memberSockets).emit(NEW_MESSAGE,{
         message:messageForRealTime,
         chatId
        })// emit emiited from server , to which server will listen
 
-       io.to(memberSockets).emit("NEW_MESSAGE_ALERT",{
+       io.to(memberSockets).emit(NEW_MESSAGE_ALERT,{
         chatId
        })
 
@@ -95,38 +95,38 @@ io.on("connection",(socket)=>{
        console.log("New message ",messageForRealTime)
     })
 
-    socket.on("start_typing",({members , chatId})=>{
+    socket.on(START_TYPING,({members , chatId})=>{
         const memberSockets = getSockets(members)
 
-        socket.to(memberSockets).emit("start_typing",{chatId})
+        socket.to(memberSockets).emit(START_TYPING,{chatId})
     })
 
-    socket.on("stop_typing",({members , chatId})=>{
+    socket.on(STOP_TYPING,({members , chatId})=>{
         const memberSockets = getSockets(members)
 
-        socket.to(memberSockets).emit("stop_typing",{chatId})
+        socket.to(memberSockets).emit(STOP_TYPING,{chatId})
     })
 
-   socket.on("chat_joined",({userId , members})=>{
+   socket.on(CHAT_JOINED,({userId , members})=>{
     onlineUsers.add(userId.toString())
     const memberSockets = getSockets(members)
 
-    io.to(memberSockets).emit("online_users",Array.from(onlineUsers))
+    io.to(memberSockets).emit(ONLINE_USERS,Array.from(onlineUsers))
    })
 
-   socket.on("chat_leaved",({userId , members})=>{
+   socket.on(CHAT_LEAVED,({userId , members})=>{
     onlineUsers.delete(userId.toString())
 
     const memberSockets = getSockets(members)
 
-    io.to(memberSockets).emit("online_users",Array.from(onlineUsers))
+    io.to(memberSockets).emit(ONLINE_USERS,Array.from(onlineUsers))
    })
 
     socket.on("disconnect",()=>{
         userSocketIDs.delete(user._id.toString())
         console.log("user disconnected")
         onlineUsers.delete(user._id.toString())
-        socket.broadcast.emit("online_users",Array.from(onlineUsers))  // if a person closes window-then should should offline
+        socket.broadcast.emit(ONLINE_USERS,Array.from(onlineUsers))  // if a person closes window-then should should offline
     })
 })
 
