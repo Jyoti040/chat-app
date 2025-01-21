@@ -65,7 +65,7 @@ const FileMenu = ({anchorEl , chatId}) => {
               <ListItemText style={{ marginLeft : "0.5rem"}}>
                 Image
               </ListItemText>
-              <input type='file' accept='image/png , image/jpeg , image/jpg , image/gif' style={{display:none}} onChange={(e)=>handleFileChange(e,"Images")} ref={imageRef} multiple/>
+              <input type='file' accept='image/png , image/jpeg , image/jpg , image/gif' style={{display:"none"}} onChange={(e)=>handleFileChange(e,"Images")} ref={imageRef} multiple/>
             </MenuItem>
                
             <MenuItem onClick={selectAudio}>
@@ -75,7 +75,7 @@ const FileMenu = ({anchorEl , chatId}) => {
               <ListItemText style={{ marginLeft : "0.5rem"}}>
                 Audio
               </ListItemText>
-              <input type='file' accept='audio/mpeg ,audio/wav' style={{display:none}} onChange={(e)=>handleFileChange(e,"Audios")} ref={audioRef} multiple/>
+              <input type='file' accept='audio/mpeg ,audio/wav' style={{display:"none"}} onChange={(e)=>handleFileChange(e,"Audios")} ref={audioRef} multiple/>
             </MenuItem>
                     
            <MenuItem onClick={selectVideo}>
@@ -85,7 +85,7 @@ const FileMenu = ({anchorEl , chatId}) => {
               <ListItemText style={{ marginLeft : "0.5rem"}}>
                 Video
               </ListItemText>
-              <input type='file' accept='video/mp4 , video/webm , video/ogg' style={{display:none}} onChange={(e)=>handleFileChange(e,"Videos")} ref={videoRef} multiple/>
+              <input type='file' accept='video/mp4 , video/webm , video/ogg' style={{display:"none"}} onChange={(e)=>handleFileChange(e,"Videos")} ref={videoRef} multiple/>
             </MenuItem>
           
             <MenuItem onClick={selectFile}>
@@ -95,7 +95,7 @@ const FileMenu = ({anchorEl , chatId}) => {
               <ListItemText style={{ marginLeft : "0.5rem"}}>
                 File
               </ListItemText>
-              <input type='file' accept='*' style={{display:none}} onChange={(e)=>handleFileChange(e,"Files")} ref={fileRef} multiple/>
+              <input type='file' accept='*' style={{display:"none"}} onChange={(e)=>handleFileChange(e,"Files")} ref={fileRef} multiple/>
             </MenuItem>
            </MenuList>
         </div>

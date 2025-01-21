@@ -38,6 +38,7 @@ const Group = () => {
 
   const [renameGroup , isLoadingGroupName]  = useAsyncMutation(useRenameGroupMutation)
   const [removeMember, isLoadingRemoveMember]  = useAsyncMutation(useRemoveGroupMemberMutation)
+  const [addMembers, isLoadingAddMembers]  = useAsyncMutation(useAddGroupMemberMutation)
   const [deleteGroup, isLoadingdeleteGroup]  = useAsyncMutation(useDeleteChatMutation)
 
   const errors = [
@@ -101,7 +102,7 @@ const Group = () => {
   const handleRemoveMember = (userId) => {
     console.log(id, 'in remove add member')
     removeMember("Removing grroup member...",{chatId:chatID , userId})
-
+    
   }
 
   return myGroups.isLoading ? <LoaderLayout/> : (

@@ -33,16 +33,17 @@ const api=createApi({
        }),
 
        chatDetails : builder.query({
-        query:({chatId , populate=false})=>{
-           let url=`chat/${chatId}`
-           if(populate) url+="?populate=true"
-
-           return {
-                url,
+        query:(data)=>(
+         //  let url=`chat/${chatId}`
+          // if(populate) url+="?populate=true"
+           // console.log("in get chat detials rtk query",url)
+            {
+                url:`chat/${data.chatId}?populate=${data.populate}`,
                 credentials:"include"
             }
-        },
-        providesTags:["Chat"]
+          ),
+        //keepUnusedDataFor:0 ,
+         providesTags:["Chat"]
        }),
 
        availableFriends : builder.query({
@@ -150,6 +151,15 @@ const api=createApi({
           credentials:"include",
         }),
         invalidatesTags:["Chat"]
+       }) ,   
+
+      leaveGroup : builder.mutation({
+        query:(chatId)=>({
+          url:`chat/leave-group/${chatId}`,
+          method:"DELETE",
+          credentials:"include",
+        }),
+        invalidatesTags:["Chat"]
        }) ,       
     })
 })
@@ -170,5 +180,7 @@ export const {
     useRenameGroupMutation,
     useRemoveGroupMemberMutation,
     useAddGroupMemberMutation,
-    useDeleteChatMutation
+    useDeleteChatMutation,
+    useLeaveGroupMutation,
+    useLazyChatDetailsQuery
 } = api

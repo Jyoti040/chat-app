@@ -7,14 +7,17 @@ import FileMenu from '../components/dialog/FileMenu';
 // import { sampleMessages, user } from '../constants/sampleData';
 import MessageComponent from '../components/Shared/MessageComponent';
 import { getSocket } from '../socket';
-import { useChatDetailsQuery, useGetMessagesQuery } from '../redux/api/api';
-import { useErrors, useSocketEvents } from '../hooks/hooks';
+import { useChatDetailsQuery, useGetMessagesQuery, useLazyChatDetailsQuery } from '../redux/api/api';
+import { useAsyncMutation, useErrors, useSocketEvents } from '../hooks/hooks';
 import {useInfiniteScrollTop} from "6pp"
 import { useDispatch } from 'react-redux';
 import { setIsFileMenu } from '../redux/reducers/misc';
 import { removeMessagesAlert } from '../redux/reducers/chat.js';
 import { TypingLoader } from '../components/Layout/Loaders.jsx';
 import { useNavigate } from 'react-router-dom';
+import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from '../constants/config.js';
+import {v4} from "uuid"
+//import { populate } from '../../../server/models/chat.js';
 
 const Chat = ({ chatId , user}) => {
 
@@ -32,48 +35,53 @@ const Chat = ({ chatId , user}) => {
   const [myselfTyping , setMyselfTyping] =useState(false)
   const [userTyping , setUserTyping] =useState(false)
 
+  const numericChatId = Number(chatId)
+
   const socket = getSocket()
-  const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId }) // if no chatid , then skip this
+  //const [getChatDetails , isLoadingChatDetails] = useAsyncMutation(useChatDetailsQuery)
+  const {isError , error , isLoading , data} = useChatDetailsQuery({chatId:chatId,populate:false}) // if no chatid , then skip this
+ // const {isError , error , isLoading , data} = useLazyChatDetailsQuery({chatId:numericChatId,populate:false}) // if no chatid , then skip this
+ 
+  console.log("in chat ",data,chatId,numericChatId,user)
+  const chatDetails=data
   const oldMessagesChunk = useGetMessagesQuery({ chatId, page})
-  const members = chatDetails.data.chat.members
+  const members = chatDetails?.chat?.members
 
   const {data:oldMessages , setData:setOldMessages} = useInfiniteScrollTop(  
     containerRef , oldMessagesChunk.data?.totalPages , page , setPage , oldMessagesChunk.data?.messages
   )
 
-  useEffect(()=>{
-     if(!chatDetails?.data?.chat) return navigate("/")
-  },[chatDetails.data])
-
   const errors = [
-    {isError : chatDetails.isError , error : chatDetails.error},
+    {isError : isError , error : error},
     {isError : oldMessagesChunk.isError , error : oldMessagesChunk.error},
   ]
 
-  const allMessages = [...oldMessages , ...messages]
+  const allMessages = [...messages , ...oldMessages ]
+  console.log("in chat all msgs ",allMessages,members,messages)
 
   const handleMessageChange = (e) =>{
     setMessage(e.target.value)
-    
+    console.log("in handleMessageChange ",message)
     if(!myselfTyping){
-      socket.emit("start_typing",{members , chatId})
-      myselfTyping(true)
+      socket.emit(START_TYPING,{members , chatId})
+      setMyselfTyping(true)
     }
 
     if(typingTimeout.current) clearTimeout(typingTimeout.current)
 
     typingTimeout.current = setTimeout(()=>{
-      socket.emit("stop_typing",{members , chatId})
+      socket.emit(STOP_TYPING,{members , chatId})
       setMyselfTyping(false)
-    },[2000])
+    },2000)
   }
 
   const handleSubmit = (e) => {
+    console.log("in handle submit ",message)
     e.preventDefault();
 
     if (!message.trim()) return
 
-    socket.emit("new_message", { chatId, members, message }) //new message event emitted to server 
+    socket.emit(NEW_MESSAGE, { chatId, members, message }) //new message event emitted to server 
     setMessage("")
   }
 
@@ -83,6 +91,7 @@ const Chat = ({ chatId , user}) => {
   } 
   
   useEffect(()=>{
+    socket.emit(CHAT_JOINED,{userId : user._id , members})
      dispatch(removeMessagesAlert(chatId))
 
      return ()=>{
@@ -90,12 +99,17 @@ const Chat = ({ chatId , user}) => {
       setMessages([])
       setOldMessages([])
       setPage(1)
+      socket.emit(CHAT_LEAVED,{userId : user._id , members})
      }
   },[chatId])
 
   useEffect(()=>{   //makes sure as new messages come , the scroller is always at bottom
     if(bottomRef.current) bottomRef.current.scrollIntoView({ behavior : "smooth"})
   },[messages])
+
+  useEffect(()=>{
+    if(chatDetails?.isError) return navigate("/")
+ },[chatDetails?.isError])
 
   const newMessageHandler = useCallback((data) => {
     if(data.chatId !== chatId) return 
@@ -114,18 +128,20 @@ const Chat = ({ chatId , user}) => {
     console.log("in stop typing listener ",data)
   }, [chatId])
 
-  // const alertListener = useCallback((content) => {
-  //   const messageForAlert = {
-  //     content,
-  //     _id:uuid(),
-  //     sender : {
-  //         _id : user._id,
-  //         name : user.name
-  //     },
-  //     chat : chatId,
-  //     createdAt: new Date().toISOString()
-  //    }
-  // }, [])
+  const alertListener = useCallback((data) => {
+    if(data.chatId !== chatId) return;
+    const messageForAlert = {
+      content:data.message,
+      _id:v4(),
+      sender : {
+          _id : "mkscwkrnxsaplpl",
+          name : "Admin"
+      },
+      chat : chatId,
+      createdAt: new Date().toISOString()
+     }
+     setMessages((prev)=>[...prev,messageForAlert])
+  }, [chatId])
 
   // useEffect(()=>{   //one way of listeing to emit emitted from backend
   //   socket.on("new_message",newMessageHandler)
@@ -136,16 +152,16 @@ const Chat = ({ chatId , user}) => {
   // },[])
 
   const eventHandler = {
-     "new_message": newMessageHandler  , 
-     "start_typing":startTypingListener , 
-     "stop_typing":stopTypingListener ,
-    //  "alert":alertListener
+     [NEW_MESSAGE]: newMessageHandler  , 
+     [START_TYPING]:startTypingListener , 
+     [STOP_TYPING]:stopTypingListener ,
+     [NEW_MESSAGE_ALERT]:alertListener
     }
 
   useSocketEvents(socket, eventHandler)
   useErrors(errors)
 
-  return chatDetails.isLoading ? (<Skeleton />) : (
+  return isLoading ? (<Skeleton />) : (
     <>
       <Stack
         ref={containerRef}
@@ -176,7 +192,7 @@ const Chat = ({ chatId , user}) => {
       >
         <Stack direction={"row"} height={"100%"} paddingTop={"1rem"} position={"relative"} >
           
-          <IconButton sx={{ position: 'absolute', paddingTop: '15px', left: '0.5rem', marginRight: '2rem' }} onClick={handleFileOpen}>
+          <IconButton type='button' title='attach file' aria-label='attach file' sx={{ position: 'absolute', paddingTop: '15px', left: '0.5rem', marginRight: '2rem' }} onClick={handleFileOpen}>
             <AttachFile />
           </IconButton>
 
@@ -186,7 +202,7 @@ const Chat = ({ chatId , user}) => {
             }}
             value={message} onChange={handleMessageChange}
           />
-          <IconButton type='submit' sx={{
+          <IconButton aria-label='send message' title='send message' type='submit' sx={{
             bgcolor: `${orange}`, color: 'white', padding: '0.5rem', "&:hover": { bgcolor: 'error.dark' }, margin: '0.5rem'
           }}>
             <Send />

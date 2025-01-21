@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Header from './Header'
 import Title from '../Shared/Title'
 import { Drawer, Grid, Skeleton } from '@mui/material'
@@ -6,7 +6,7 @@ import ChatLists from '../specific/ChatLists'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMyChatsQuery } from '../../redux/api/api'
 import { useDispatch, useSelector } from 'react-redux'
-import { setIsDeleteMenu, setIsMobile } from '../../redux/reducers/misc'
+import { setIsDeleteMenu, setIsMobile, setSelectedDeletedChat } from '../../redux/reducers/misc'
 import toast from 'react-hot-toast'
 import { useErrors, useSocketEvents } from '../../hooks/hooks'
 import Profile from '../specific/Profile'
@@ -14,6 +14,7 @@ import { getSocket } from '../../socket'
 import { incrementNotification, setNewMessagesAlert } from '../../redux/reducers/chat.js'
 import { getOrSaveFromLocalStorage } from '../../lib/features.js'
 import DeleteChatMenu from '../dialog/DeleteChatMenu.jsx'
+import { NEW_MESSAGE_ALERT, NEW_REQUEST, ONLINE_USERS, REFETCH_CHATS } from '../../constants/config.js'
 
 const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
   return (props)=>{
@@ -23,24 +24,29 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
     const navigate = useNavigate()
     const deleteMenuAnchor = useRef(null)
 
+    const [onlineUsers , setOnlineUsers] = useState([])
+
     const {isMobile} = useSelector((state)=>state.misc)
     const {user} = useSelector((state)=>state.auth)
-    const {newMessageAlert} = useSelector((state)=>state.chat)
+    const {newMessagesAlert} = useSelector((state)=>state.chat)
 
     const chatID= params.chatID;
 
     const socket = getSocket()
 
     const {isLoading , data , isError , error , refetch} = useMyChatsQuery("")
+    console.log("in app layout new msg alert  ",newMessagesAlert)
 
     useEffect(()=>{
-      getOrSaveFromLocalStorage({key:"new_message_alert",value:newMessageAlert})
-    },[newMessageAlert])
+      getOrSaveFromLocalStorage({key:"new_message_alert",value:newMessagesAlert,get:false})
+
+    },[newMessagesAlert])
 
     const handleDeleteChat=(e,_id,groupchat)=>{
       console.log('in delete chat')
       e.preventDefault();
       dispatch(setIsDeleteMenu(true))
+      dispatch(setSelectedDeletedChat({chatId:chatID,groupchat}))
       deleteMenuAnchor.current = e.curretTarget
     }
 
@@ -68,10 +74,15 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
       navigate("/")
     },[refetch , navigate])
 
+    const onlineUsersHandler = useCallback((data)=>{
+     setOnlineUsers(data)
+    },[])
+
     const eventHandlers = {  //event listeners
-      "new_message_alert": newMessageAlertHandler ,
-      "new_request": newRequestHandler ,
-      "refetch_chats": refetchChatHandler ,
+      [NEW_MESSAGE_ALERT]: newMessageAlertHandler ,
+      [NEW_REQUEST]: newRequestHandler ,
+      [REFETCH_CHATS]: refetchChatHandler ,
+      [ONLINE_USERS]:onlineUsersHandler
       }
 
     useSocketEvents(socket, eventHandlers) 
@@ -88,7 +99,9 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
               isLoading ? (<Skeleton/>):(
                 <Drawer open={isMobile} onClose={handleMobileClose}>
                    <ChatLists
-                         chats={data?.chats} chatID={chatID} handleDeleteChat={handleDeleteChat} newMessagesAlert={newMessageAlert}
+                         chats={data?.chats} chatID={chatID} 
+                         handleDeleteChat={handleDeleteChat} newMessagesAlert={newMessagesAlert}
+                         onlineUsers={onlineUsers}
                     />
                 </Drawer>
               )
@@ -106,7 +119,9 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
                     {
                       isLoading ? (<Skeleton/>):(
                         <ChatLists
-                         chats={data?.chats} chatID={chatID} handleDeleteChat={handleDeleteChat} newMessagesAlert={newMessageAlert}
+                         chats={data?.chats} chatID={chatID} 
+                         handleDeleteChat={handleDeleteChat} newMessagesAlert={newMessagesAlert}
+                         onlineUsers={onlineUsers}
                         />
                       )
                     }
@@ -115,7 +130,7 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
                      <WrappedComponent {...props} chatId={chatID} user={user}/>
                  </Grid>
 
-                 <Profile user={user}/>
+                 {/* <Profile user={user}/> */}
                  {/* user profile */}
             </Grid>
         </>

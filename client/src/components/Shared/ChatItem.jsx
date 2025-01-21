@@ -2,17 +2,22 @@ import React, { memo } from 'react'
 import { StyledLink } from '../styles/StyledComponents'
 import { Box, Stack, Typography } from '@mui/material'
 import AvatarCard from './AvatarCard'
+import {motion} from 'framer-motion'
 
 const ChatItem = ({
   avatar=[] ,name , _id , groupChat = false , sameSender , isOnline , newMessageAlert , index=0 , handleDeleteChat
 }) => {
   return (
     <StyledLink to={`/chat/${_id}`} onContextMenu={(e)=> handleDeleteChat(e,_id,groupChat)}>
-        <div style={{
+        <motion.div 
+          initial={{opacity:0,y:"-100%"}}
+          whileInView={{opacity:1,y:0}}
+          transition={{delay:index*0.1}}
+        style={{
           display:'flex' , alignItems:'center' ,
           padding:'1rem' , position:'relative' , gap:'1rem',
           backgroundColor: newMessageAlert?'black':'unset' , 
-          color: sameSender?'white':'black' ,
+          color: sameSender?'blue':'black' ,
           borderBottom: "1px solid #f0f0f0"
         }}>
          <AvatarCard avatar={avatar}/>
@@ -28,7 +33,7 @@ const ChatItem = ({
           {
             isOnline && <Box />
           }
-        </div>
+        </motion.div>
     </StyledLink>
   )
 }

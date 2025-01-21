@@ -2,10 +2,12 @@ import { Add, Remove } from '@mui/icons-material'
 import { Avatar, IconButton, ListItem, Stack, Typography } from '@mui/material'
 import React , {memo} from 'react'
 import { transformImage } from '../../lib/features'
+import { useSelector } from 'react-redux'
 
 const UserItem = ({user,handler,handlerIsLoading , isAdded=false , styling={}}) => {
 
     const {name , _id , avatar} =  user
+   // const isFriendAdded = useSelector((state)=>state.misc)
 
   return (
     <ListItem>

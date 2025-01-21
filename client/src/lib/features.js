@@ -16,12 +16,31 @@ const transformImage = (url="",width=100) => {
     return newUrl
 };
 
-const getOrSaveFromLocalStorage = ({key,value,get}) => {
-       if(get){
-        return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : null
-       }else{
-        localStorage.setItem(key,JSON.stringify(value))
-       }
-}
+const getOrSaveFromLocalStorage = ({ key, value, get }) => {
+    console.log("in getOrSaveFromLocalStorage ", key, value, get);
+
+    if (get) {
+        const item = localStorage.getItem(key); 
+        console.log("Retrieved from localStorage: ", item);
+
+        if (item) {
+            try {
+                return JSON.parse(item); 
+            } catch (error) {
+                console.error("Error parsing JSON from localStorage:", error);
+                return null;
+            }
+        }
+        return null;
+    } else {
+        try {
+            console.log(" in getOrSaveFromLocalStorage  seting value",value, JSON.stringify(value))
+            localStorage.setItem(key, JSON.stringify(value)); 
+        } catch (error) {
+            console.error("Error saving to localStorage:", error);
+        }
+    }
+};
+
 
 export {fileFormat , transformImage , getOrSaveFromLocalStorage}

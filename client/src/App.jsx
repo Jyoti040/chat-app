@@ -24,8 +24,8 @@ const App = () => {
   useEffect(()=>{
     axios.get(`${server}/api/v1/user/my-profile`,{withCredentials:true})
     .then((data)=>{
-      console.log('in app.js ' , data)
-      dispatch(userExists(data.user))
+      console.log('in app.js ' , data?.data?.user)
+      dispatch(userExists(data?.data?.user))
     })
     .catch((err)=>{
       dispatch(userNotExists())

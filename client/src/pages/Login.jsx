@@ -1,6 +1,6 @@
 import { Avatar, Button, Container, IconButton, Paper, Stack, TextField, Typography } from '@mui/material'
 import React ,{ useState} from 'react'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import { CameraAlt  } from '@mui/icons-material'
 import { VisuallyHiddenInput } from '../components/styles/StyledComponents'
 import axios from 'axios'
@@ -23,27 +23,41 @@ const Login = () => {
 //  console.log('username' , username)
 const [email , setEmail] = useState("")
 const [password , setPassword] = useState("")
+const [loading,setIsLoading] = useState(false)
+
+const navigate = useNavigate()
 
 const handleLogin = async(e)=>{
     e.preventDefault()
 
+    setIsLoading(true)
+    const toastId = toast.loading("Signing in")
+
     const config ={
         withCredentials:true , 
-        headers:{
-            "Content-Type":"application/json"
-        }
+        // headers:{
+        //     "Content-Type":"application/json"
+        // }
     }
 
   try {
-    const {data}=axios.post(`${server}/api/v1/user/login`,{
+    const {data}= await axios.post(`${server}/api/v1/user/login`,{
         userEmail:email,
         password
     },config)
-
-    dispatch(userExists(true))
-    toast.success(data.message)
-  } catch (error) {toast.error(error?.response?.data?.message || "Something went wrong")
-    
+   console.log("in login success",data)
+    dispatch(userExists(data.user))
+    toast.success(data.message,{
+        id:toastId
+    })
+    navigate("/")
+  } catch (error) {
+    console.log("in login error",error)
+    toast.error(error?.response?.data?.message || "Something went wrong",{
+    id:toastId
+})   
+  }finally{
+    setIsLoading(false)
   }
 }
   return (
@@ -124,7 +138,7 @@ const handleLogin = async(e)=>{
                 
                     <TextField  required fullWidth label='Password' type='password' margin='normal' variant='outlined' value={password} onChange={(e)=>setPassword(e.target.value)}/>
 
-                    <Button color='primary' variant='contained' fullWidth type='submit'>Login</Button>
+                    <Button color='primary' variant='contained' fullWidth type='submit' disabled={loading}>Login</Button>
 
                     <Typography textAlign={"center"} m={"1rem"}>OR</Typography>
                     <Link to='/register'>

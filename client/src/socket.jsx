@@ -7,7 +7,6 @@ const getSocket = ()=>useContext(SocketContext)
 
 const SocketProvider = ({children})=>{
     const socket =useMemo(()=>io(import.meta.env.VITE_SERVER,{withCredentials:true}) , [])
-
     return (
         <SocketContext.Provider value={socket}>
             {children}

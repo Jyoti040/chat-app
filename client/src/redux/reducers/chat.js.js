@@ -8,6 +8,11 @@ const initialState = {
       chatId:"",
       count:0
    }],
+   // newMessagesAlert : getOrSaveFromLocalStorage({key:"new_message_alert",get:true}) ? 
+   // ( getOrSaveFromLocalStorage({key:"new_message_alert",get:true})) :
+   // ([{
+   //    chatId:"", count:0
+   // }])
 }
 
 const chatSlice = createSlice({

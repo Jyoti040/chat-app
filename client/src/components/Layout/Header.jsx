@@ -45,12 +45,16 @@ const Header = () => {
     }
     
     const handleLogout = async() => {
-        console.log('in logout ')
+       
         try {
-            const {data} = axios.get(`${server}/api/v1/user/logout`,{withCredentials:true})
+            const {data} =await axios.get(`${server}/api/v1/user/logout`,{withCredentials:true})
+            console.log('in logout ',data)
             toast.success(data.message)
             dispatch(userNotExists())
+            
+            navigate("/")
         } catch (error) {
+            console.log('in logout error ',error)
             toast.error(error?.response?.data?.message || "Something went wrong ")
         }
     }
@@ -109,7 +113,7 @@ const Header = () => {
         </Box>
 
         {
-            isSearch &&<Suspense fallback={<Backdrop open/>}>
+            isSearch &&<Suspense fallback={<Backdrop open={isSearch}/>}>
                 <SearchDialog/>
             </Suspense>
         }
@@ -132,7 +136,7 @@ const IconBtn = ({ title, Icon, func ,value}) => {
         <Tooltip title={title}>
             <IconButton color='inherit' size='large' onClick={func}>
                {
-                value ? <Badge badgeContent={value} color='error'>{Icon}</Badge> : {Icon}
+                value ? <Badge badgeContent={value} color='error'>{Icon}</Badge> : Icon
                }
             </IconButton>
         </Tooltip>

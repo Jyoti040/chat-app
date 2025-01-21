@@ -4,7 +4,7 @@ import {Search as SearchIcon} from '@mui/icons-material'
 import UserItem from '../Shared/UserItem'
 import { sampleUsers } from '../../constants/sampleData'
 import { useDispatch, useSelector } from 'react-redux'
-import { setIsSearch } from '../../redux/reducers/misc'
+import { setIsFriendAdded, setIsSearch } from '../../redux/reducers/misc'
 import { useLazySearchUserQuery, useSendFriendRequestMutation } from '../../redux/api/api'
 import toast from 'react-hot-toast'
 import { useAsyncMutation } from '../../hooks/hooks'
@@ -13,8 +13,11 @@ const Search = () => {
 
   const [searchValue , setSearchValue] = useState("")
   const [users,setUsers] = useState([])
-  const {isSearch} = useSelector((state)=>state.misc)
+
+  const {isSearch , isFriendAdded} = useSelector((state)=>state.misc)
+  const {user : loggedInUser} = useSelector((state)=>state.auth)
    const dispatch = useDispatch()
+
    const [searchUser] = useLazySearchUserQuery("")
    const [sendFriendRequest , isLoadingFriendRequest ,]= useAsyncMutation(useSendFriendRequestMutation)
   // const [sendFriendRequest] = useSendFriendRequestMutation() //trigger , function - sendFriendRequest , can be given any other name as well
@@ -36,10 +39,11 @@ const Search = () => {
     // }
 
    await sendFriendRequest("Sending friend request ",{userId:id})
+ //  dispatch(setIsFriendAdded(true))
   }
 
   const searchCloseHandler=()=>{
-    useDispatch(setIsSearch(false))
+    dispatch(setIsSearch(false))
   }
 
   useEffect(()=>{
@@ -47,7 +51,12 @@ const Search = () => {
     const timeOutId=setTimeout(()=>{
       console.log('in search user ',searchValue)
       searchUser(searchValue)
-      .then(({data})=>setUsers(data.users))
+      .then(({data})=>{
+        console.log("in search user , user  ",data , loggedInUser)
+        const updatedUsers = data.users.filter((user)=>user._id.toString() !== loggedInUser._id.toString())
+        console.log("after updated users ",updatedUsers)
+        setUsers(updatedUsers)
+      })
       .catch((err)=>console.log("in search user ",err))
     },1000)
 

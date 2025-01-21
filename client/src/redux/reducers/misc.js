@@ -12,9 +12,9 @@ const initialState = {
    selectedDeletedChat:{
     chatId:"",
     groupChat:false
-   }
+   },
+   // isFriendAdded:false
 }
-
 
 const miscSlice = createSlice({
      name:"misc",
@@ -44,9 +44,12 @@ const miscSlice = createSlice({
          setIsUploadingLoader:(state , action)=>{
             state.uploadingLoader = action.payload
          }  ,
-         setIsSelectedDeletedChat:(state , action)=>{
+         setSelectedDeletedChat:(state , action)=>{
             state.selectedDeletedChat = action.payload
          }  ,
+         // setIsFriendAdded:(state , action)=>{
+         //    state.isFriendAdded = action.payload
+         // }  ,
      }
 })
 
@@ -59,6 +62,7 @@ export const {
     setIsMobile,
     setIsNotification,
     setIsSearch,
-    setIsSelectedDeletedChat,
-    setIsUploadingLoader
+    setSelectedDeletedChat,
+    setIsUploadingLoader,
+    setIsFriendAdded
 } = miscSlice.actions
