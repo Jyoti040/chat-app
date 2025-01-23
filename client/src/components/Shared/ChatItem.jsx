@@ -7,6 +7,7 @@ import {motion} from 'framer-motion'
 const ChatItem = ({
   avatar=[] ,name , _id , groupChat = false , sameSender , isOnline , newMessageAlert , index=0 , handleDeleteChat
 }) => {
+  console.log("in chatitem",newMessageAlert)
   return (
     <StyledLink to={`/chat/${_id}`} onContextMenu={(e)=> handleDeleteChat(e,_id,groupChat)}>
         <motion.div 
@@ -17,7 +18,7 @@ const ChatItem = ({
           display:'flex' , alignItems:'center' ,
           padding:'1rem' , position:'relative' , gap:'1rem',
           backgroundColor: newMessageAlert?'black':'unset' , 
-          color: sameSender?'blue':'black' ,
+          color: sameSender?'blue':'green' ,
           borderBottom: "1px solid #f0f0f0"
         }}>
          <AvatarCard avatar={avatar}/>
@@ -26,7 +27,7 @@ const ChatItem = ({
             // sx={{color:sameSender?'black':'inherit'}}
             >{name}</Typography>
             {
-              newMessageAlert && <Typography>{newMessageAlert?.count} new messages</Typography>
+              newMessageAlert.count>0 && <Typography>{newMessageAlert?.count} new messages</Typography>
             }
           </Stack>
 

@@ -39,6 +39,11 @@ const chatSlice = createSlice({
             },
             removeMessagesAlert : (state,action)=>{
                state.newMessagesAlert = state.newMessagesAlert.filter((item)=>item.chatId !== action.payload.chatId)
+               // getOrSaveFromLocalStorage({key:"new_message_alert",value:{
+               //    chatId:action.payload.chatId,
+               //    count:0
+               // }})
+               console.log("in remove message alert ",state.newMessagesAlert)
             }
          }
 })

@@ -10,7 +10,7 @@ import { getSocket } from '../socket';
 import { useChatDetailsQuery, useGetMessagesQuery, useLazyChatDetailsQuery } from '../redux/api/api';
 import { useAsyncMutation, useErrors, useSocketEvents } from '../hooks/hooks';
 import {useInfiniteScrollTop} from "6pp"
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setIsFileMenu } from '../redux/reducers/misc';
 import { removeMessagesAlert } from '../redux/reducers/chat.js';
 import { TypingLoader } from '../components/Layout/Loaders.jsx';
@@ -34,6 +34,8 @@ const Chat = ({ chatId , user}) => {
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null)
   const [myselfTyping , setMyselfTyping] =useState(false)
   const [userTyping , setUserTyping] =useState(false)
+
+  const {newMessagesAlert} =useSelector((state)=>state.chat)
 
   const numericChatId = Number(chatId)
 
@@ -93,6 +95,7 @@ const Chat = ({ chatId , user}) => {
   useEffect(()=>{
     socket.emit(CHAT_JOINED,{userId : user._id , members})
      dispatch(removeMessagesAlert(chatId))
+     console.log("in use effect chatjs",newMessagesAlert)
 
      return ()=>{
       setMessage("")

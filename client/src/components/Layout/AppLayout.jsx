@@ -39,7 +39,7 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
 
     useEffect(()=>{
       getOrSaveFromLocalStorage({key:"new_message_alert",value:newMessagesAlert,get:false})
-
+      
     },[newMessagesAlert])
 
     const handleDeleteChat=(e,_id,groupchat)=>{
