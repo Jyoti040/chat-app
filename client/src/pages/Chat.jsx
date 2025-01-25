@@ -58,8 +58,8 @@ const Chat = ({ chatId , user}) => {
     {isError : oldMessagesChunk.isError , error : oldMessagesChunk.error},
   ]
 
-  const allMessages = [...messages , ...oldMessages ]
-  console.log("in chat all msgs ",allMessages,members,messages)
+  // const allMessages = [  ...oldMessages , ...messages ]
+ // console.log("in chat all msgs ",allMessages)
 
   const handleMessageChange = (e) =>{
     setMessage(e.target.value)
@@ -74,7 +74,7 @@ const Chat = ({ chatId , user}) => {
     typingTimeout.current = setTimeout(()=>{
       socket.emit(STOP_TYPING,{members , chatId})
       setMyselfTyping(false)
-    },2000)
+    },[2000])
   }
 
   const handleSubmit = (e) => {
@@ -111,8 +111,8 @@ const Chat = ({ chatId , user}) => {
   },[messages])
 
   useEffect(()=>{
-    if(chatDetails?.isError) return navigate("/")
- },[chatDetails?.isError])
+    if(isError) return navigate("/")
+ },[isError])
 
   const newMessageHandler = useCallback((data) => {
     if(data.chatId !== chatId) return 
@@ -131,20 +131,21 @@ const Chat = ({ chatId , user}) => {
     console.log("in stop typing listener ",data)
   }, [chatId])
 
-  const alertListener = useCallback((data) => {
-    if(data.chatId !== chatId) return;
-    const messageForAlert = {
-      content:data.message,
-      _id:v4(),
-      sender : {
-          _id : "mkscwkrnxsaplpl",
-          name : "Admin"
-      },
-      chat : chatId,
-      createdAt: new Date().toISOString()
-     }
-     setMessages((prev)=>[...prev,messageForAlert])
-  }, [chatId])
+  // const alertListener = useCallback((data) => {
+  //   if(data.chatId !== chatId) return;
+  //   console.log("in alert listener",data)
+  //   const messageForAlert = {
+  //     content:data.message,
+  //     _id:v4(),
+  //     sender : {
+  //         _id : "mkscwkrnxsaplpl",
+  //         name : "Admin"
+  //     },
+  //     chat : chatId,
+  //     createdAt: new Date().toISOString()
+  //    }
+  //    setMessages((prev)=>[...prev,messageForAlert])
+  // }, [chatId])
 
   // useEffect(()=>{   //one way of listeing to emit emitted from backend
   //   socket.on("new_message",newMessageHandler)
@@ -158,11 +159,13 @@ const Chat = ({ chatId , user}) => {
      [NEW_MESSAGE]: newMessageHandler  , 
      [START_TYPING]:startTypingListener , 
      [STOP_TYPING]:stopTypingListener ,
-     [NEW_MESSAGE_ALERT]:alertListener
+    //  [NEW_MESSAGE_ALERT]:alertListener
     }
 
   useSocketEvents(socket, eventHandler)
   useErrors(errors)
+
+  const allMessages = [  ...oldMessages , ...messages ]
 
   return isLoading ? (<Skeleton />) : (
     <>
