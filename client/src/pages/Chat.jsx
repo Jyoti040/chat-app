@@ -61,6 +61,21 @@ const Chat = ({ chatId , user}) => {
   // const allMessages = [  ...oldMessages , ...messages ]
  // console.log("in chat all msgs ",allMessages)
 
+ useEffect(()=>{
+  socket.emit(CHAT_JOINED,{userId : user._id , members})
+   dispatch(removeMessagesAlert(chatId))
+   console.log("in use effect chatjs","678bf6727540bebc52933966"===chatId)
+
+   return ()=>{
+    setMessage("")
+    setMessages([])
+    setOldMessages([])
+    setPage(1)
+    socket.emit(CHAT_LEAVED,{userId : user._id , members})
+   }
+},[chatId])
+
+
   const handleMessageChange = (e) =>{
     setMessage(e.target.value)
     console.log("in handleMessageChange ",message)
@@ -92,20 +107,6 @@ const Chat = ({ chatId , user}) => {
       setFileMenuAnchor(e.currentTarget)
   } 
   
-  useEffect(()=>{
-    socket.emit(CHAT_JOINED,{userId : user._id , members})
-     dispatch(removeMessagesAlert(chatId))
-     console.log("in use effect chatjs",newMessagesAlert)
-
-     return ()=>{
-      setMessage("")
-      setMessages([])
-      setOldMessages([])
-      setPage(1)
-      socket.emit(CHAT_LEAVED,{userId : user._id , members})
-     }
-  },[chatId])
-
   useEffect(()=>{   //makes sure as new messages come , the scroller is always at bottom
     if(bottomRef.current) bottomRef.current.scrollIntoView({ behavior : "smooth"})
   },[messages])

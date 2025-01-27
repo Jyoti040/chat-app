@@ -66,6 +66,7 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
     },[chatID])
 
     const newRequestHandler = useCallback(()=>{
+      console.log("inside new request handler")
       dispatch(incrementNotification())
     },[dispatch])
 
