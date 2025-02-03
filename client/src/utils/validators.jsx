@@ -2,7 +2,7 @@ import { isValidUsername } from "6pp"
 
 
 export const usernameValidator = (username)=>{
-    if(isValidUsername){
+    if(isValidUsername(username)){
         return {isValid:false , errorMesage:"User name is invalid"}
     }
 }
