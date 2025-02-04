@@ -38,7 +38,7 @@ const chatSlice = createSlice({
                }
             },
             removeMessagesAlert : (state,action)=>{
-               state.newMessagesAlert = state.newMessagesAlert.filter((item)=>item.chatId !== action.payload.chatId)
+               state.newMessagesAlert = state.newMessagesAlert.filter((item)=>item.chatId !== action.payload)
                // getOrSaveFromLocalStorage({key:"new_message_alert",value:{
                //    chatId:action.payload.chatId,
                //    count:0

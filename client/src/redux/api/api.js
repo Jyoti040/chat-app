@@ -105,11 +105,11 @@ const api=createApi({
        }) ,
 
        newGroup : builder.mutation({
-        query:({name , members})=>({
+        query:({groupName, members})=>({
           url:"chat/new",
           method:"POST",
           credentials:"include",
-          body:{name , members}
+          body:{groupName, members}
         }),
         invalidatesTags:["Chat"]
        }) ,  
