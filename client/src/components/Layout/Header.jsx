@@ -17,10 +17,10 @@ const NewGroupDialog = lazy(()=>import('../specific/NewGroup'))
 
 const Header = () => {
     const navigate = useNavigate()
-   const {isSearch , isNotification , isNewGorup} = useSelector((state)=>state.misc)
-   const {notificationCount} = useSelector((state)=>state.chat)
-
     const dispatch = useDispatch()
+
+   const {isSearch , isNotification , isNewGroup} = useSelector((state)=>state.misc)
+   const {notificationCount} = useSelector((state)=>state.chat)
 
     const openSearchDiagloue = () => {
         dispatch(setIsSearch(true))
@@ -79,7 +79,7 @@ const Header = () => {
                         Chat App
                     </Typography>
                     <Box sx={{ display: { xs: 'block', sm: 'none' }, }}>
-                        <IconButton color='inherit'>
+                        <IconButton color='inherit' onClick={handleMobile}>
                             <Menu />
                         </IconButton>
                     </Box>
@@ -123,7 +123,7 @@ const Header = () => {
             </Suspense>
         }
         {
-            isNewGorup &&<Suspense fallback={<Backdrop open/>}>
+            isNewGroup &&<Suspense fallback={<Backdrop open={isNewGroup}/>}>
                 <NewGroupDialog/>
             </Suspense>
         }
@@ -132,11 +132,12 @@ const Header = () => {
 }
 
 const IconBtn = ({ title, Icon, func ,value}) => {
+  //  console.log("in icon button header ",title," ",value)
     return (
         <Tooltip title={title}>
             <IconButton color='inherit' size='large' onClick={func}>
                {
-                value ? <Badge badgeContent={value} color='error'>{Icon}</Badge> : Icon
+                value ? <Badge badgeContent={value} color='secondary'>{Icon}</Badge> : Icon
                }
             </IconButton>
         </Tooltip>

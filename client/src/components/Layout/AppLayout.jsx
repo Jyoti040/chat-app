@@ -19,12 +19,13 @@ import { NEW_MESSAGE_ALERT, NEW_REQUEST, ONLINE_USERS, REFETCH_CHATS } from '../
 const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
   return (props)=>{
 
+    const [onlineUsers , setOnlineUsers] = useState([])
+    
     const dispatch = useDispatch()
     const params = useParams()
     const navigate = useNavigate()
     const deleteMenuAnchor = useRef(null)
-
-    const [onlineUsers , setOnlineUsers] = useState([])
+    const socket = getSocket()
 
     const {isMobile} = useSelector((state)=>state.misc)
     const {user} = useSelector((state)=>state.auth)
@@ -32,10 +33,8 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
 
     const chatID= params.chatID;
 
-    const socket = getSocket()
-
     const {isLoading , data , isError , error , refetch} = useMyChatsQuery("")
-    console.log("in app layout new msg alert  ",newMessagesAlert)
+    console.log("in app layout use my chats query  ",data)
 
     useEffect(()=>{
       getOrSaveFromLocalStorage({key:"new_message_alert",value:newMessagesAlert,get:false})
@@ -62,6 +61,7 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
 
     const newMessageAlertHandler = useCallback((data)=>{
       if(data.chatId === chatID) return 
+      console.log("in newMessageAlertHandler ",data)
        dispatch(setNewMessagesAlert(data))
     },[chatID])
 

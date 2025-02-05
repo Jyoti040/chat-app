@@ -14,7 +14,7 @@ const ChatLists = ({w="100%" , chats=[] , chatID , onlineUsers=[]  , newMessages
 
             const newMessageAlert = newMessagesAlert.find(({chatId})=>chatId===_id)
 
-            const isOnline = members?.some((member)=>onlineUsers.includes(_id))
+            const isOnline = members?.some((member)=>onlineUsers.includes(member))
             console.log('in chat list ',newMessageAlert)
 
             return <ChatItem index={index}
