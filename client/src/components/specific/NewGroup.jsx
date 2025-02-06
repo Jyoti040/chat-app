@@ -1,7 +1,7 @@
 import { Button, Dialog, DialogTitle, Skeleton, Stack, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { sampleUsers } from '../../constants/sampleData'
-import UserItem from './UserItem'
+import UserItem from '../Shared/UserItem'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAvailableFriendsQuery, useNewGroupMutation } from '../../redux/api/api'
 import { useAsyncMutation, useErrors } from '../../hooks/hooks'
@@ -43,7 +43,7 @@ const NewGroup = () => {
     if(groupName.length<1) return toast.error("Group name is required")
     if(selectedMembers.length<2) return toast.error("Group must have atleast 3 members")
 
-    newGroup("Creating new group ... ",{name : groupName , members:selectedMembers})
+    newGroup("Creating new group ... ",{ groupName , members:selectedMembers})
 
     closeHandler()
   }

@@ -5,6 +5,7 @@ import UserItem from '../Shared/UserItem'
 import { useAsyncMutation, useErrors } from '../../hooks/hooks'
 import { useAddGroupMemberMutation, useAvailableFriendsQuery } from '../../redux/api/api'
 import { useDispatch, useSelector } from 'react-redux'
+import { setIsAddMember } from '../../redux/reducers/misc'
 
 const AddMemberDialog = ({chatId}) => {
 
@@ -12,9 +13,9 @@ const AddMemberDialog = ({chatId}) => {
 
     const dispatch = useDispatch()
 
-    const [addMembers , isLoadingAddMembers]  = useAsyncMutation(useAddGroupMemberMutation)
-    const {isAddMember} =useSelector((state)=>state.misc) 
+    const {isAddMember} =useSelector((state)=>state.misc)
 
+    const [addMembers , isLoadingAddMembers]  = useAsyncMutation(useAddGroupMemberMutation)
     const {isError , error ,isLoading , data} = useAvailableFriendsQuery(chatId)
   
     const selectMemberHandler = (id) => {
@@ -35,12 +36,12 @@ const AddMemberDialog = ({chatId}) => {
     }
 
     const handleClose = () =>{
-       setMembers([])
+    //   setMembers([])
        setSelectedMembers([])
-       dispatch(isAddMember(false))
+       dispatch(setIsAddMember(false))
     }
 
-    useErrors({error , isError})
+    useErrors([{error , isError}])
 
   return (
    <Dialog open={isAddMember} onClose={handleClose}>

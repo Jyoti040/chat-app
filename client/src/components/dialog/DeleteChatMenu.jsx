@@ -15,11 +15,12 @@ const DeleteChatMenu = ({dispatch , deleteMenuAnchor}) => {
  const [deleteChat,_,deleteChatData] = useAsyncMutation(useDeleteChatMutation)
  const [leaveGroup,__,leaveGroupData] = useAsyncMutation(useDeleteChatMutation)
 
- const isGroup =  selectedDeletedChat.groupChat
+ const isGroup =  selectedDeletedChat.groupchat
 
+ console.log("inn  DeleteChatMenu ",selectedDeletedChat)
  const closeHandler = () => {
     dispatch(setIsDeleteMenu(false))
-    deleteMenuAnchor.current=null
+    deleteMenuAnchor=null
  }
     
  const leaveGroupHandler = () => {
@@ -39,26 +40,36 @@ const DeleteChatMenu = ({dispatch , deleteMenuAnchor}) => {
   return (
     <Menu open={isDeleteMenu} 
     onClose={closeHandler} 
-    anchorEl={deleteMenuAnchor.current} 
-    anchorOrigin={{vertical:"bottom" , horizontal:"right"}}
-    transformOrigin={{vertical:"center" , horizontal:"center"}}
+    anchorEl={deleteMenuAnchor} 
+    anchorOrigin={{
+      vertical: "bottom",
+      horizontal: "right",
+    }}
+    transformOrigin={{
+      vertical: "center",
+      horizontal: "center",
+    }} 
     >
        <Stack
          sx={{
-            width : "10rem" , padding :"0.5rem" , cursor:"pointer"
+            width : "11rem" , padding :"0.5rem" , cursor:"pointer"
          }}
          direction={"row"} alignItems={"center"} spacing={"0.5rem"}
           onClick={isGroup?leaveGroupHandler:deleteChatHandler}
        >
          {
             isGroup?
-            (<><ExitToApp>
-               <Typography>Leave Group</Typography>
-               </ExitToApp></>)
+            (
+              <>
+              <ExitToApp/>
+              <Typography  fontSize={"16px"}>Leave Group</Typography>
+              </>
+              
+            )
             :
-            (<><DeleteOutline>
-               <Typography>Delete Chat</Typography>
-               </DeleteOutline></>)
+            (<><DeleteOutline />
+               <Typography  fontSize={"16px"}>Delete Chat</Typography>
+            </>)
          }
        </Stack>
     </Menu>

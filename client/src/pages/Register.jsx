@@ -84,7 +84,11 @@ const handlePassword = (e)=>{
 
 const handleRegister = async(e)=>{
     e.preventDefault()
-
+    
+    if(!imageToSend){
+        toast.error("Please upload an avatar to register ")
+        return
+    }
     setIsLoading(true)
     const toastId = toast.loading("Creating a new account")
     const config ={
