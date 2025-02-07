@@ -31,7 +31,7 @@ const loginValidator = () => [
 ]  
 
 const newGroupChatValidator = () => [
-    body("name", "Please provide a name").notEmpty(),
+    body("groupName", "Please provide a name").notEmpty(),
     body("members")
     .notEmpty().withMessage("Please provide group members")
     .isArray({min:2 , max:100}).withMessage("Members must be with range of 2-100")
