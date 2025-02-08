@@ -20,11 +20,12 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
   return (props)=>{
 
     const [onlineUsers , setOnlineUsers] = useState([])
+    const [deleteMenuAnchor,setDeleteMenuAnchor] = useState(null)
     
     const dispatch = useDispatch()
     const params = useParams()
     const navigate = useNavigate()
-    const deleteMenuAnchor = useRef(null)
+ //   const deleteMenuAnchor = useRef(null)
     const socket = getSocket()
 
     const {isMobile} = useSelector((state)=>state.misc)
@@ -45,8 +46,9 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
       console.log('in delete chat')
       e.preventDefault();
       dispatch(setIsDeleteMenu(true))
-      dispatch(setSelectedDeletedChat({chatId:chatID,groupchat}))
-      deleteMenuAnchor.current = e.curretTarget
+      dispatch(setSelectedDeletedChat({chatId:_id,groupchat}))
+     // deleteMenuAnchor= e.currentTarget
+     setDeleteMenuAnchor(e.currentTarget)
     }
 
     const handleMobileClose=()=>{

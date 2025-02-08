@@ -11,6 +11,7 @@ const ChatItem = ({
   console.log("in chatitem",newMessageAlert)
 
   const showNewMessageAlert = groupChat && !sameSender
+  
   return (
     <Link to={`/chat/${_id}`} onContextMenu={(e)=> handleDeleteChat(e,_id,groupChat)}>
         <motion.div 

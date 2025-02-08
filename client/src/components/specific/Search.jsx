@@ -39,7 +39,7 @@ const Search = () => {
     // }
 
    await sendFriendRequest("Sending friend request ",{userId:id})
- //  dispatch(setIsFriendAdded(true))
+      dispatch(setIsFriendAdded(true))
   }
 
   const searchCloseHandler=()=>{
