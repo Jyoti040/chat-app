@@ -15,7 +15,7 @@ const newGroupChat = async(req,res,next)=>{
         }
 
         const allMembers = [...members , req.user]
-
+        console.log("in newGroupChat",allMembers)
         await Chat.create({
             name : groupName,
             groupChat: true , 
@@ -37,17 +37,20 @@ const newGroupChat = async(req,res,next)=>{
 
 const getMyChats = async(req,res,next)=>{
  try {
-    const chats = await Chat.find({members : req.user}).populate(
-        "members",
-        "name avatar"
-    )
+    const chats = await Chat.find({members : req.user}).populate( "members")
 
+   // console.log("in get my chats ",chats)
     const transformedChats = chats.map(({_id,name , members,groupChat })=>{
         const otherMember = getOtherMember(members,req.user)
+        let avatarArray
+       if(groupChat) {
+         avatarArray = members.slice(0,3).map((data)=>data.avatar.url)
+       // console.log("inside func ",avatarArray)
+       }
         return {
             _id,groupChat ,
             avatar : groupChat ? (
-                members.slice(0,3).map((avatar)=>avatar.url)
+                avatarArray
             ):(
                 [otherMember.avatar.url]
             ),
@@ -61,6 +64,7 @@ const getMyChats = async(req,res,next)=>{
         }
     }) 
 
+    //console.log("in get my transformed chats ",transformedChats)
     return res.status(200).json({
         success:true , 
         chats : transformedChats
@@ -247,7 +251,13 @@ const sendAttachments = async(req,res,next)=>{
             throw new CustomAPIError("No chat found",404)
         }
           
-        const attachments = await uploadToCloudinary(files)
+        //const attachments = await uploadToCloudinary(files)
+        let attachments = [];
+
+        files.forEach(file => {
+            const result = await uploadToCloudinary(file)
+            attachments.push(result)
+        });
 
         const messageForRealTime ={
             content : "" , attachments ,
@@ -257,6 +267,7 @@ const sendAttachments = async(req,res,next)=>{
              },
               chat : chatId
         }
+
         const messageForDB ={ content : "" , attachments , sender : user._id , chat : chatId}
 
         const message = await Message.create(messageForDB)
@@ -297,11 +308,11 @@ const getChatDetails = async(req,res,next)=>{
             chat
         })
         }else{
-            console.log("in get chat details , populate - false before chat ",req.params)
+          //  console.log("in get chat details , populate - false before chat ",req.params)
             const chatId = req.params.id
             const chat = await Chat.findById(chatId)
 
-            console.log("in get chat details , populate - false",chat)
+           // console.log("in get chat details , populate - false",chat)
  
             if(!chat){
              throw new CustomAPIError("No chat found",404)
@@ -353,6 +364,8 @@ const renameGroup = async(req,res,next)=>{
 const deleteChat = async(req,res,next)=>{
     try {
         const chatId = req.params.id
+
+        console.log("in delete chat ",chatId)
         const chat = await Chat.findById(chatId)
 
         if(!chat){

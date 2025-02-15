@@ -12,7 +12,7 @@ import { useAsyncMutation, useErrors, useSocketEvents } from '../hooks/hooks';
 import {useInfiniteScrollTop} from "6pp"
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsFileMenu } from '../redux/reducers/misc';
-import { removeMessagesAlert } from '../redux/reducers/chat.js';
+import { removeMessagesAlert } from '../redux/reducers/chat';
 import { TypingLoader } from '../components/Layout/Loaders.jsx';
 import { useNavigate } from 'react-router-dom';
 import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from '../constants/config.js';
@@ -44,7 +44,7 @@ const Chat = ({ chatId , user}) => {
   const {isError , error , isLoading , data} = useChatDetailsQuery({chatId:chatId,populate:false}) // if no chatid , then skip this
  // const {isError , error , isLoading , data} = useLazyChatDetailsQuery({chatId:numericChatId,populate:false}) // if no chatid , then skip this
  
-  console.log("in chat ",data,chatId,numericChatId,user)
+//  console.log("in chat ",data,chatId,numericChatId,user)
   const chatDetails=data
   const oldMessagesChunk = useGetMessagesQuery({ chatId, page})
   const members = chatDetails?.chat?.members
@@ -62,8 +62,10 @@ const Chat = ({ chatId , user}) => {
  // console.log("in chat all msgs ",allMessages)
 
  useEffect(()=>{
+  console.log("before remove msg alert")
+  dispatch(removeMessagesAlert(chatId))
+  console.log("after remove msg alert")
   socket.emit(CHAT_JOINED,{userId : user._id , members})
-   dispatch(removeMessagesAlert(chatId))
    console.log("in use effect chatjs","678bf6727540bebc52933966"===chatId)
 
    return ()=>{
@@ -166,6 +168,7 @@ const Chat = ({ chatId , user}) => {
   useSocketEvents(socket, eventHandler)
   useErrors(errors)
 
+  oldMessages.reverse()
   const allMessages = [  ...oldMessages , ...messages ]
 
   return isLoading ? (<Skeleton />) : (
