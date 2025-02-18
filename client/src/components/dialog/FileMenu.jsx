@@ -27,32 +27,40 @@ const FileMenu = ({anchorEl , chatId}) => {
      dispatch(setIsFileMenu(false))
   }
 
-   const handleFileChange = async(e,key)=>{
-      const files = Array.from(e.target.files)
+  const handleFileChange = async (e, key) => {
+    const files = Array.from(e.target.files); 
 
-      if(files.length <=0) return ;
-      if(files.length >5) toast.error(`You can't upload more than 5 ${key} at a time`);
-      
-      dispatch(setIsUploadingLoader(true))
-      const toastId = toast.loading(`Sending ${key} ... `)
-      closeFileMenu()
+    if (files.length <= 0) return;
+    if (files.length > 5) {
+        toast.error(`You can't upload more than 5 ${key} at a time`);
+        return;
+    }
 
-      try{
-        const myForm = new FormData()
+    dispatch(setIsUploadingLoader(true));
+    const toastId = toast.loading(`Sending ${key} ...`);
+    closeFileMenu();
 
-        myForm.append("chatId",chatId)
-        files.forEach((file)=> myForm.append("files",file))
+    try {
+        const myForm = new FormData();
+        myForm.append("chatId", chatId);
+        files.forEach((file) => myForm.append("files", file)); 
 
-        const res = await sendAttachments(myForm)
+        console.log("Uploading FormData:", myForm);
 
-        if(res.data) toast.success(`${key} sent successfully` , {id:toastId})
-        else   toast.error(`Failed to send ${key}` , {id : toastId}) 
-      }catch(error){
-        toast.error(error , {id : toastId})
-      }finally{
-        dispatch(setIsUploadingLoader(false))
-      }
-  }
+        const res = await sendAttachments(myForm);
+
+        if (res.data) {
+            toast.success(`${key} sent successfully`, { id: toastId });
+        } else {
+            toast.error(`Failed to send ${key}`, { id: toastId });
+        }
+    } catch (error) {
+        toast.error(error.message || "File upload failed", { id: toastId });
+    } finally {
+        dispatch(setIsUploadingLoader(false));
+    }
+};
+
 
   return (
     <Menu anchorEl={anchorEl} open={isFileMenu} onClose={closeFileMenu}>

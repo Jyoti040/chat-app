@@ -28,7 +28,7 @@ const Group = () => {
   const [members, setMembers] = useState([])
 
   const navigate = useNavigate()
-  const chatID = useSearchParams()[0].get('group')
+  let chatID = useSearchParams()[0].get('group')
   const dispatch = useDispatch()
 
   const {isAddMember} =useSelector((state)=>state.misc)
@@ -94,13 +94,15 @@ const Group = () => {
   }
 
   const handleDeleteGroup = () => {
+    console.log("in handle delete grp ",chatID)
     deleteGroup("Deleting group...",{chatId : chatID})
     handleCloseConfirmDeleteDialog()
+    chatID=null
     navigate("/groups")
   }
 
   const handleRemoveMember = (userId) => {
-    console.log(id, 'in remove add member')
+    console.log(userId, 'in remove add member')
     removeMember("Removing grroup member...",{chatId:chatID , userId})
     
   }
@@ -114,6 +116,9 @@ const Group = () => {
           }
         }} sm={4} bgcolor={'bisque'}
       >
+        <Typography variant='h5' style={{
+          display:'flex' , alignItems:'center' , justifyContent:'center' , marginTop:'1rem' , paddingBottom:'1rem',borderBottom:'2px solid black'
+        }}>My Groups</Typography>
         <GroupLists myGroups={myGroups?.data?.groups} chatID={chatID} />
 
       </Grid>
@@ -160,7 +165,7 @@ const Group = () => {
                     }} >
 
                       <Stack direction={'row'} spacing={"2rem"} >
-                        <Typography variant='h4'>{groupName} {chatID}</Typography>
+                        <Typography variant='h4'>{groupName}</Typography>
                         <IconButton onClick={() => setIsEditing(true)} disabled={isLoadingGroupName}>
                           <Edit />
                         </IconButton>
@@ -199,9 +204,14 @@ const Group = () => {
             sm: '1rem', xs: '0'
           }}
         >
-          <Button size='large' variant='outlined' onClick={handleOpenConfirmDeleteDialog} startIcon={<Delete />} color='error'>Delete Group </Button>
-          <Button size='large' variant='contained' onClick={handleAddMembers} startIcon={<Add />}> Add Members </Button>
-
+          {
+            chatID ? (<>
+            <Button size='large' variant='outlined' onClick={handleOpenConfirmDeleteDialog} startIcon={<Delete />} color='error'>Delete Group </Button>
+            <Button size='large' variant='contained' onClick={handleAddMembers} startIcon={<Add />}> Add Members </Button>
+            </>):(
+              <Typography variant='h5'>Select a group to manage !</Typography>
+            )
+          }
         </Stack>
       </Grid>
 
