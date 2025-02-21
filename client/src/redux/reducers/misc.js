@@ -9,6 +9,7 @@ const initialState = {
    isFileMenu:false,
    isDeleteMenu:false,
    uploadingLoader:false,
+   showProfile:false,
    selectedDeletedChat:{
     chatId:"",
     groupChat:false
@@ -47,6 +48,9 @@ const miscSlice = createSlice({
          setSelectedDeletedChat:(state , action)=>{
             state.selectedDeletedChat = action.payload
          }  ,
+         setShowProfile:(state , action)=>{
+            state.showProfile = action.payload
+         }  ,
          // setIsFriendAdded:(state , action)=>{
          //    state.isFriendAdded = action.payload
          // }  ,
@@ -64,5 +68,6 @@ export const {
     setIsSearch,
     setSelectedDeletedChat,
     setIsUploadingLoader,
-    setIsFriendAdded
+    setIsFriendAdded,
+    setShowProfile
 } = miscSlice.actions

@@ -8,7 +8,7 @@ import { server } from '../../constants/config'
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux'
 import { userNotExists } from '../../redux/reducers/auth'
-import { setIsMobile, setIsNotification, setIsSearch , setIsNewGroup} from '../../redux/reducers/misc'
+import { setIsMobile, setIsNotification, setIsSearch , setIsNewGroup, setShowProfile} from '../../redux/reducers/misc'
 import { resetNotification } from '../../redux/reducers/chat.js'
 
 const SearchDialog = lazy(()=>import('../specific/Search'))
@@ -61,7 +61,8 @@ const Header = () => {
 
     const handleGoToProfile=()=>{
         console.log('in profile section')
-        navigate('/profile/1')
+        // navigate('/profile/1')
+        dispatch(setShowProfile(true))
     }
 
     const handleMobile=()=>{
