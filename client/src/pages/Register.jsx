@@ -109,72 +109,101 @@ const Register = () => {
     }
 
     return (
-        <Container component={"main"} maxWidth='sm' sx={{
-            height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", marginTop: "2rem", marginBottom: "2rem"
-        }}>
-            <Paper elevation={3} sx={{ padding: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <>
-                    <Typography variant='h4'>Register</Typography>
-                    <form style={{
-                        width: "100%", marginTop: "1rem"
-                    }}
-                        onSubmit={handleRegister}
-                    >
-                        <Stack position={"relative"} width={"10rem"} margin={"auto"}>
-                            <Avatar sx={{
-                                width: "10rem",
-                                height: "10rem",
-                                objectFit: "contain",
+        <div
+  style={{
+    minHeight: "100vh",
+    width: "100vw",
+    backgroundImage: "linear-gradient(rgba(200,200,200,0.5),rgba(120,110,220,0.5))",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundAttachment: "fixed",
+  }}
+>
+  <Container
+    maxWidth="sm"
+    sx={{
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <Paper
+      elevation={3}
+      sx={{
+        padding: 4,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
+      <>
+        <Typography variant="h4" >
+          Register
+        </Typography>
+        <form
+          style={{
+            width: "100%",
+            marginTop: "1rem",
+          }}
+          onSubmit={handleRegister}
+        >
+          <Stack position={"relative"} width={"10rem"} margin={"auto"}>
+            <Avatar
+              sx={{
+                width: "10rem",
+                height: "10rem",
+                objectFit: "contain",
+              }}
+              src={image}
+            />
+            <IconButton
+              sx={{
+                position: "absolute",
+                bottom: "0",
+                right: "0",
+                color: "white",
+                bgcolor: "rgba(0,0,0,0.5)",
+                ":hover": {
+                  bgcolor: "rgba(0,0,0,0.7)",
+                },
+              }}
+              component="label"
+            >
+              <>
+                <CameraAlt />
+                <VisuallyHiddenInput type="file" accept="image/*" onChange={handleImage} />
+              </>
+            </IconButton>
+          </Stack>
+          <TextField required fullWidth label="Name" margin="normal" variant="outlined" value={name} onChange={(e) => setName(e.target.value)} />
+          <TextField required fullWidth label="UserName" margin="normal" variant="outlined" value={userName} onChange={(e) => setUserName(e.target.value)} />
+          <TextField required fullWidth label="Email" margin="normal" variant="outlined" value={email} onChange={(e) => setEmail(e.target.value)} />
 
-                            }}
-                                src={image}
-                            />
-                            <IconButton sx={{
-                                position: "absolute",
-                                bottom: "0", right: "0",
-                                color: "white",
-                                bgcolor: "rgba(0,0,0,0.5)",
-                                ":hover": {
-                                    bgcolor: "rgba(0,0,0,0.7)",
-                                },
+          <TextField required fullWidth label="Bio" margin="normal" variant="outlined" multiline rows={5} value={bio} onChange={(e) => setBio(e.target.value)} />
+          <TextField required fullWidth label="Password" type={showPassword ? "text" : "password"} margin="normal" variant="outlined" value={password} onChange={handlePassword} />
 
-                            }}
-                                component="label"
-                            >
-                                <>
-                                    <CameraAlt />
-                                    <VisuallyHiddenInput type="file" accept='image/*' onChange={handleImage} />
-                                </>
-                            </IconButton>
-                        </Stack>
-                        <TextField required fullWidth label='Name' margin='normal' variant='outlined' value={name} onChange={(e) => setName(e.target.value)} />
-                        <TextField required fullWidth label='UserName' margin='normal' variant='outlined' value={userName} onChange={(e) => setUserName(e.target.value)} />
-                        <TextField required fullWidth label='Email' margin='normal' variant='outlined' value={email} onChange={(e) => setEmail(e.target.value)} />
+          {passwordValidateMessage.length > 0 && (
+            <Typography variant="p" color="error">
+              {passwordValidateMessage}
+            </Typography>
+          )}
 
-                        <TextField required fullWidth label='Bio' margin='normal' variant='outlined' multiline rows={5} value={bio} onChange={(e) => setBio(e.target.value)} />
-                        <TextField required fullWidth label='Password' type={showPassword ? 'text' : 'password'} margin='normal' variant='outlined' value={password} onChange={handlePassword}
-                        />
+          <Button color="primary" variant="contained" fullWidth type="submit" disabled={loading}>
+            Register
+          </Button>
 
-                        {
-                            passwordValidateMessage.length > 0 && <Typography variant='p' color='error'>
-                                {passwordValidateMessage}
-                            </Typography>
-                        }
+          <Typography textAlign="center" variant="body1" sx={{ mt: "1rem", display: "block" }}>
+            Already have an account?
+            <Link to="/login"> LOGIN</Link>
+          </Typography>
+        </form>
+      </>
+    </Paper>
+  </Container>
+</div>
 
-                        <Button color='primary' variant='contained' fullWidth type='submit' disabled={loading} >Register </Button>
-
-                        <Typography
-                            textAlign="center"
-                            variant="body1"
-                            sx={{ mt: "1rem", display: "block" }}
-                        >
-                            Already have an account ?
-                            <Link to='/login'> LOGIN</Link>
-                        </Typography>
-                    </form>
-                </>
-            </Paper>
-        </Container>
     )
 }
 
