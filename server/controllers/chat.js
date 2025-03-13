@@ -230,6 +230,7 @@ const leaveGroup = async(req,res,next)=>{
 
 const sendAttachments = async(req,res,next)=>{
     try {
+        console.log("in send attachemnts ",req.body)
         const {chatId }= req.body
 
         const files = req.files || []
@@ -251,13 +252,7 @@ const sendAttachments = async(req,res,next)=>{
             throw new CustomAPIError("No chat found",404)
         }
           
-        //const attachments = await uploadToCloudinary(files)
-        let attachments = [];
-
-        files.forEach(file => {
-            const result = await uploadToCloudinary(file)
-            attachments.push(result)
-        });
+        const attachments = await Promise.all(files.map(file => uploadToCloudinary(file)));
 
         const messageForRealTime ={
             content : "" , attachments ,

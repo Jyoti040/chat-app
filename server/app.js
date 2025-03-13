@@ -58,9 +58,9 @@ io.on("connection",(socket)=>{
     //     name:"test"
     // }
     const user = socket.user
-    console.log("user connected ",socket.id)
+   // console.log("user connected ",socket.id)
     userSocketIDs.set(user._id.toString() , socket.id)
-    console.log("in coonection event emit ",userSocketIDs)
+  //  console.log("in coonection event emit ",userSocketIDs)
 
     socket.on(NEW_MESSAGE,async ({chatId , members , message})=>{  // emit emiited from frontend / client , to which server are listening here
        const messageForRealTime = {
@@ -110,7 +110,7 @@ io.on("connection",(socket)=>{
    socket.on(CHAT_JOINED,({userId , members})=>{
     onlineUsers.add(userId.toString())
     const memberSockets = getSockets(members)
-
+    console.log("in chat joined backend ")
     io.to(memberSockets).emit(ONLINE_USERS,Array.from(onlineUsers))
    })
 
@@ -124,7 +124,7 @@ io.on("connection",(socket)=>{
 
     socket.on("disconnect",()=>{
         userSocketIDs.delete(user._id.toString())
-        console.log("user disconnected")
+     //   console.log("user disconnected")
         onlineUsers.delete(user._id.toString())
         socket.broadcast.emit(ONLINE_USERS,Array.from(onlineUsers))  // if a person closes window-then should should offline
     })

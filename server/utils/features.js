@@ -16,8 +16,8 @@ const uploadToCloudinary = async(file)=>{
         if(!file){
               throw new CustomAPIError("Please upload an avatar",400)
         }
-
-        const result = await cloudinary.uploader.upload(file,{
+        console.log('in upload to cloudinary before ',file)
+        const result = await cloudinary.uploader.upload(file.path,{
                 resource_type:"auto",
                 public_id:v4()
         })
