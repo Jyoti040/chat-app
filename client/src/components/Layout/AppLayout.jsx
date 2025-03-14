@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import Header from './Header'
 import Title from '../Shared/Title'
-import { Drawer, Grid, Skeleton } from '@mui/material'
+import { Drawer, Grid, Grid2, Skeleton } from '@mui/material'
 import ChatLists from '../specific/ChatLists'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMyChatsQuery } from '../../redux/api/api'
 import { useDispatch, useSelector } from 'react-redux'
 import { setIsDeleteMenu, setIsMobile, setSelectedDeletedChat } from '../../redux/reducers/misc'
-import toast from 'react-hot-toast'
 import { useErrors, useSocketEvents } from '../../hooks/hooks'
 import Profile from '../specific/Profile'
 import { getSocket } from '../../socket'
@@ -25,17 +24,17 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
     const dispatch = useDispatch()
     const params = useParams()
     const navigate = useNavigate()
- //   const deleteMenuAnchor = useRef(null)
+
     const socket = getSocket()
 
-    const {isMobile} = useSelector((state)=>state.misc)
+    const {isMobile,showProfile} = useSelector((state)=>state.misc)
     const {user} = useSelector((state)=>state.auth)
     const {newMessagesAlert} = useSelector((state)=>state.chat)
 
     const chatID= params.chatID;
 
     const {isLoading , data , isError , error , refetch} = useMyChatsQuery("")
-    console.log("in app layout use my chats query  ",data)
+    console.log("in app layout use my chats query  ",showProfile)
 
     useEffect(()=>{
       getOrSaveFromLocalStorage({key:"new_message_alert",value:newMessagesAlert,get:false})
@@ -95,7 +94,6 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
         <>
             <Title/>
             <Header/>
-
             <DeleteChatMenu dispatch={dispatch} deleteMenuAnchor={deleteMenuAnchor}/>
 
             {
@@ -111,7 +109,7 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
             }
 
             <Grid container sx={{ height: 'calc(100vh - 4rem)' }}>
-                 <Grid item sm={4} height={"100%"} sx={{display:{xs:'none' , sm:'block'}}}>
+                 <Grid item sm={showProfile?3:4} height={"100%"} sx={{display:{xs:'none' , sm:'block'}}}>
                     {/* <ChatLists chats={sampleChats} chatID={chatID} 
                     newMessagesAlert={[{
                       chatID:chatID,count:4
@@ -129,12 +127,19 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
                       )
                     }
                  </Grid>
-                 <Grid item xs={12} sm={8} height={"100%"} >
+                 <Grid item xs={12} sm={showProfile?6:8}  height={"100%"} >
                      <WrappedComponent {...props} chatId={chatID} user={user}/>
                  </Grid>
 
-                 {/* <Profile user={user}/> */}
+           {
+              showProfile &&  <Grid item sm={3} height={"100%"} sx={{display:{xs:'none' , sm:'block'}}} >
+                     <Profile user={user}/>
+              </Grid>
+           }     
+
+          
                  {/* user profile */}
+              
             </Grid>
         </>
     )
