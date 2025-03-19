@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import AppLayout from '../components/Layout/AppLayout';
-import { Container, IconButton, Skeleton, Stack } from '@mui/material';
+import { Container, IconButton, Paper, Skeleton, Stack, Typography } from '@mui/material';
 import { gray, orange } from '../constants/colors';
 import { AttachFile, Send } from '@mui/icons-material';
 import FileMenu from '../components/dialog/FileMenu';
@@ -14,9 +14,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setIsFileMenu } from '../redux/reducers/misc';
 import { removeMessagesAlert } from '../redux/reducers/chat';
 import { TypingLoader } from '../components/Layout/Loaders.jsx';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from '../constants/config.js';
-import {v4} from "uuid"
+import AvatarCard from '../components/Shared/AvatarCard.jsx';
 //import { populate } from '../../../server/models/chat.js';
 
 const Chat = ({ chatId , user}) => {
@@ -27,6 +27,7 @@ const Chat = ({ chatId , user}) => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
@@ -35,9 +36,9 @@ const Chat = ({ chatId , user}) => {
   const [myselfTyping , setMyselfTyping] =useState(false)
   const [userTyping , setUserTyping] =useState(false)
 
-  const {newMessagesAlert} =useSelector((state)=>state.chat)
+  console.log("in chats js ",chatId , user)
 
-  const numericChatId = Number(chatId)
+  const {newMessagesAlert} =useSelector((state)=>state.chat)
 
   const socket = getSocket()
   //const [getChatDetails , isLoadingChatDetails] = useAsyncMutation(useChatDetailsQuery)
@@ -58,6 +59,7 @@ const Chat = ({ chatId , user}) => {
     {isError : oldMessagesChunk.isError , error : oldMessagesChunk.error},
   ]
 
+  const {avatar , name } = location.state
   // const allMessages = [  ...oldMessages , ...messages ]
  // console.log("in chat all msgs ",allMessages)
 
@@ -66,7 +68,6 @@ const Chat = ({ chatId , user}) => {
   dispatch(removeMessagesAlert(chatId))
   console.log("after remove msg alert")
   socket.emit(CHAT_JOINED,{userId : user._id , members})
-   console.log("in use effect chatjs","678bf6727540bebc52933966"===chatId)
 
    return ()=>{
     setMessage("")
@@ -170,16 +171,40 @@ const Chat = ({ chatId , user}) => {
 
   oldMessages.reverse()
   const allMessages = [  ...oldMessages , ...messages ]
+  console.log("in chat all msgs ",allMessages)
 
   return isLoading ? (<Skeleton />) : (
     <>
+      {/* <Stack
+      boxSizing={"border-box"}
+      padding={"1rem"}
+      spacing={"1rem"}
+      bgcolor={"lightGray"}
+      direction={"row"}
+      sx={{ position:'sticky'}}
+      >
+         <AvatarCard avatar={avatar} />
+         <Typography variant="h6" sx={{ color: 'lightBlack'}}>
+            {name}
+          </Typography>
+      </Stack> */}
+
+      <Paper
+       sx={{ position:'sticky' , display:'flex' , padding:'1rem' , zIndex:'100' , bgcolor:'lightgray'}}
+      >
+      <AvatarCard avatar={avatar} />
+         <Typography variant="h5" sx={{ color: 'black'}}>
+            {name}
+          </Typography>
+      </Paper>
+
       <Stack
         ref={containerRef}
         boxSizing={"border-box"}
         padding={"1rem"}
         spacing={"1rem"}
         bgcolor={gray}
-        height={"90%"}
+        height={"80%"}
         sx={{
           overflowX: "hidden", overflowY: "auto"
         }}
@@ -202,7 +227,7 @@ const Chat = ({ chatId , user}) => {
       >
         <Stack direction={"row"} height={"100%"} paddingTop={"1rem"} position={"relative"} >
           
-          <IconButton type='button' title='attach file' aria-label='attach file' sx={{ position: 'absolute', paddingTop: '15px', left: '0.5rem', marginRight: '2rem' }} onClick={handleFileOpen}>
+          <IconButton type='button' title='attach file' aria-label='attach file' sx={{ position: 'absolute', paddingTop: '15px', left: '0.5rem', marginRight: '2rem' , paddingBottom:"1rem" }} onClick={handleFileOpen}>
             <AttachFile />
           </IconButton>
 
@@ -213,14 +238,13 @@ const Chat = ({ chatId , user}) => {
             value={message} onChange={handleMessageChange}
           />
           <IconButton aria-label='send message' title='send message' type='submit' sx={{
-            bgcolor: `${orange}`, color: 'white', padding: '0.5rem', "&:hover": { bgcolor: 'error.dark' }, margin: '0.5rem'
+            bgcolor: `${orange}`, color: 'white', padding: '0.5rem', "&:hover": { bgcolor: 'error.dark' }, margin: '0.5rem' 
           }}>
             <Send />
           </IconButton>
 
         </Stack>
       </form>
-
       <FileMenu anchorEl={fileMenuAnchor} chatId={chatId}/>
     </>
   )

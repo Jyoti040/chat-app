@@ -20,7 +20,6 @@ const Profile = ({ user }) => {
       >
         <Close />
       </IconButton>
-
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '3px solid black' }}>
         <Avatar src={user.avatar?.url} sx={{
           height: 200, width: 200, paddingTop: '0rem', marginTop: '1rem',

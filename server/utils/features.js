@@ -36,8 +36,8 @@ const uploadToCloudinary = async(file)=>{
        }
 }
 
-const deleteFilesFromCloudinary = async(public_ids)=>{
+// const deleteFilesFromCloudinary = async(public_ids)=>{
 
-}
+// }
 
-module.exports = {emitEvent , deleteFilesFromCloudinary , uploadToCloudinary}
+module.exports = {emitEvent , uploadToCloudinary}

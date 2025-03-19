@@ -15,6 +15,7 @@ const AvatarCard = ({ avatar = [], max = 4 }) => {
               width: "2rem",
               height: "2rem",
               marginLeft: index === 0 ? "0rem" : "0.5rem", 
+              borderColor:'black'
             }}
           />
         ))}

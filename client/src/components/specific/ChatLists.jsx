@@ -10,6 +10,7 @@ const ChatLists = ({w="100%" , chats=[] , chatID , onlineUsers=[]  , newMessages
     <Stack width={w} direction={"column"}>
        {
         chats?.map((chat,index)=>{
+          console.log("in chat lists chat -",chat)
             const {avatar , _id , name , groupChat , members} = chat
 
             const newMessageAlert = newMessagesAlert.find(({chatId})=>chatId===_id)

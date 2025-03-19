@@ -2,11 +2,10 @@ import { FileOpen } from '@mui/icons-material'
 import React from 'react'
 import { transformImage } from '../../lib/features'
 
-const RenderAttachment = ({file,url}) => {
-  
+const RenderAttachment = ({file,url}) => { 
     switch (file) {
         case 'video':
-            return <video src={url} preload='none' controls/>
+            return <video src={url} preload='none' controls height={'300px'} width={'300px'}/>
 
         case 'audio':
             return <audio src={url} preload='none' controls/>

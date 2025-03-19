@@ -3,6 +3,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import AvatarCard from './AvatarCard';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+//import { useTheme } from '@emotion/react';
 
 const ChatItem = ({
   avatar = [],
@@ -17,11 +18,11 @@ const ChatItem = ({
 }) => {
   console.log("in chatitem", newMessageAlert);
 
-  const showNewMessageAlert = groupChat && !sameSender && newMessageAlert?.count > 0;
+  const showNewMessageAlert = !sameSender && newMessageAlert?.count > 0;
 
   return (
     <Link
-      to={`/chat/${_id}`}
+      to={`/chat/${_id}`} state={{ avatar: avatar, name }}
       onContextMenu={(e) => handleDeleteChat(e, _id, groupChat)}
       style={{ textDecoration: 'none', color: 'black' }} // Ensures no underline & black text
     >
@@ -36,7 +37,7 @@ const ChatItem = ({
           position: 'relative',
           gap: '1rem',
           backgroundColor: 'unset',
-          color: 'black',
+          color: 'white',
           // borderBottom: '1px solid rgb(3, 2, 2)',
         }}
       >
@@ -45,9 +46,9 @@ const ChatItem = ({
           <Typography variant="h6" sx={{ color: 'black', textDecoration: 'none' }}>
             {name}
           </Typography>
-          {newMessageAlert?.count>0 && showNewMessageAlert && (
-            <Typography variant="body2" sx={{ color: 'black', textDecoration: 'none' }}>
-              {newMessageAlert?.count} new messages 
+          {newMessageAlert?.count > 0 && showNewMessageAlert && (
+            <Typography variant="body2" sx={{ color: 'theme.palette.text.primary', textDecoration: 'none' }}>
+              {newMessageAlert?.count} new messages
             </Typography>
           )}
         </Stack>

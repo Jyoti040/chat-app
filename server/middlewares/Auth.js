@@ -48,7 +48,6 @@ const socketAuthenticator =async (err,socket,next)=>{
         socket.user = user
        // console.log("in socketAuthenticator socket ",socket.user)
          next()
-
     } catch (error) {
         // throw new CustomAPIError("Please login first to access this route" , 401);
         next(error)

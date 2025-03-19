@@ -2,11 +2,9 @@ import { Dialog, DialogTitle, InputAdornment, List, ListItem, ListItemText, Stac
 import React , {useEffect, useState} from 'react'
 import {Search as SearchIcon} from '@mui/icons-material'
 import UserItem from '../Shared/UserItem'
-import { sampleUsers } from '../../constants/sampleData'
 import { useDispatch, useSelector } from 'react-redux'
 import { setIsFriendAdded, setIsSearch } from '../../redux/reducers/misc'
 import { useLazySearchUserQuery, useSendFriendRequestMutation } from '../../redux/api/api'
-import toast from 'react-hot-toast'
 import { useAsyncMutation } from '../../hooks/hooks'
 
 const Search = () => {
@@ -47,7 +45,6 @@ const Search = () => {
   }
 
   useEffect(()=>{
-
     const timeOutId=setTimeout(()=>{
       console.log('in search user ',searchValue)
       searchUser(searchValue)
@@ -71,7 +68,6 @@ const Search = () => {
           <DialogTitle textAlign={"center"}>
             Find People
           </DialogTitle>
-
           <TextField 
            label="" variant='outlined' size='small'
            value={searchValue} onChange={(e)=>e.target.value}
@@ -84,7 +80,6 @@ const Search = () => {
            }}
           />
         </Stack>
-
         <List>
           {
             users.map((user)=>(

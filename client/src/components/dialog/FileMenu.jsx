@@ -61,11 +61,11 @@ const FileMenu = ({anchorEl , chatId}) => {
     }
 };
 
-
   return (
     <Menu anchorEl={anchorEl} open={isFileMenu} onClose={closeFileMenu}>
         <div style={{width:'10rem'}} >
            <MenuList>
+            
             <MenuItem onClick={selectImage}>
               <Tooltip title="Image">
                 <Image/>

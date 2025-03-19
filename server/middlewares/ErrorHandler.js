@@ -24,8 +24,7 @@ const ErrorHandler = (err,req,res,next)=>{
 
     if(envMode==="DEVELOPMENT") response.error = err
 
-    return res.status(statusCode).json(response)
-    
+    return res.status(statusCode).json(response)    
 }
 
 module.exports = ErrorHandler

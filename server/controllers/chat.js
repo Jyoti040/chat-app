@@ -360,7 +360,7 @@ const deleteChat = async(req,res,next)=>{
     try {
         const chatId = req.params.id
 
-        console.log("in delete chat ",chatId)
+        console.log("in delete chat ",req.params)
         const chat = await Chat.findById(chatId)
 
         if(!chat){

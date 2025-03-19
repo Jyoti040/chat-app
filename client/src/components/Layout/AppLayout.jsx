@@ -42,7 +42,7 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
     },[newMessagesAlert])
 
     const handleDeleteChat=(e,_id,groupchat)=>{
-      console.log('in delete chat')
+      console.log('in delete chat',_id)
       e.preventDefault();
       dispatch(setIsDeleteMenu(true))
       dispatch(setSelectedDeletedChat({chatId:_id,groupchat}))
@@ -137,9 +137,6 @@ const AppLayout = () => (WrappedComponent)=> {  //HOC - Higher order component
               </Grid>
            }     
 
-          
-                 {/* user profile */}
-              
             </Grid>
         </>
     )

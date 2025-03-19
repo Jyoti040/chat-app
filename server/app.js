@@ -44,8 +44,6 @@ app.get('/',(req,res)=>{
 // let userSocketIDs = new Map()  // all members currently connected to socket
 // let onlineUsers = new Set() 
 
-
-
 io.use((socket , next )=>{
      cookieParser()(socket.request,socket.request.res,
         async (err)=>{  await socketAuthenticator(err , socket , next)

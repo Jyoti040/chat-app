@@ -18,6 +18,7 @@ const DeleteChatMenu = ({dispatch , deleteMenuAnchor}) => {
  const isGroup =  selectedDeletedChat.groupchat
 
  console.log("inn  DeleteChatMenu ",selectedDeletedChat)
+ 
  const closeHandler = () => {
     dispatch(setIsDeleteMenu(false))
     deleteMenuAnchor=null
@@ -25,12 +26,13 @@ const DeleteChatMenu = ({dispatch , deleteMenuAnchor}) => {
     
  const leaveGroupHandler = () => {
    closeHandler()
-   leaveGroup("Leaving group...",selectedDeletedChat.chatId)
+   leaveGroup("Leaving group...",{chatId:selectedDeletedChat.chatId})
  }
 
  const deleteChatHandler = () => {
    closeHandler()
-   deleteChat("Deleting chat...",selectedDeletedChat.chatId)
+   console.log("in delete chat handler ",typeof selectedDeletedChat.chatId)
+   deleteChat("Deleting chat...",{chatId:selectedDeletedChat.chatId})
  }
 
  useEffect(()=>{

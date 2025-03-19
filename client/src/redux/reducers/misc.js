@@ -69,5 +69,5 @@ export const {
     setSelectedDeletedChat,
     setIsUploadingLoader,
     setIsFriendAdded,
-    setShowProfile
+    setShowProfile,
 } = miscSlice.actions

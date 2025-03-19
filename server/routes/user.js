@@ -7,7 +7,6 @@ const { registerValidator, validateHandler, loginValidator, sendFriendRequestVal
 
 // upload.single('avatar')
 router.post('/register',upload.single("avatar"), registerValidator() ,validateHandler,registerUser)
-
 router.post('/login',loginValidator(),validateHandler,loginUser)
 
 router.use(verifyUser) // all the furrther routes must be authenticated
